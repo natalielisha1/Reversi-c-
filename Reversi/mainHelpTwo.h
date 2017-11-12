@@ -8,7 +8,11 @@
 #ifndef MAINHELPTWO_H_
 #define MAINHELPTWO_H_
 
+#include <string>
 
+std::string main3() {
+	return std::string("this time it will stick, hopefully");
+}
 
 
 
