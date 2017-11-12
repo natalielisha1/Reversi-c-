@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "mainHelp.h"
+#include "mainHelpTwo.h"
 using namespace std;
 
 int main() {
