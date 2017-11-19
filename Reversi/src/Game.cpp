@@ -70,7 +70,7 @@ void Game::run() {
 		gameBoard->printBoard();
 		if (move != Point(-1,-1)) {
 			cout << "O played ";
-			move++;//.deAlignToPrint();
+			++move;//.deAlignToPrint();
 			move.printPoint();
 			cout << endl << endl;
 		}
@@ -99,7 +99,7 @@ void Game::run() {
 		gameBoard->printBoard();
 		if (move != Point(-1,-1)) {
 			cout << "X played ";
-			move++;//.deAlignToPrint();
+			++move;//.deAlignToPrint();
 			move.printPoint();
 			cout << endl << endl;
 		}
@@ -165,7 +165,7 @@ vector<Point> *Game::calcMoves(Board::Cell cell) {
 			Point currPoint = getPointFromDir(*it, dirs[indexer]);
 			//Checking if there is a move in this direction
 			if (checkMoveEmpty(cell, currPoint, dirs[indexer])) {
-				currPoint++;//.deAlignToPrint();
+				++currPoint;//.deAlignToPrint();
 				if (!isPointInVector(options, currPoint)) {
 					options->push_back(currPoint);
 				}

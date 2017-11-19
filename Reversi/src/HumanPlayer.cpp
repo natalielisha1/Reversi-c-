@@ -103,7 +103,7 @@ Point HumanPlayer::makeMove(vector<Point> *options) {
 				 * Returning the Point formatted in
 				 * a way the board can understand
 				 */
-				tempPoint.alignToPrint();
+				--tempPoint;//.alignToPrint();
 				return tempPoint;
 			}
 		}
