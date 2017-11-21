@@ -210,11 +210,11 @@ Board::Cell Board::getCell(Point point) {
  *  replacing the cell in that location
  *  with playerType
  **************************************/
-bool Board::put(Point point, Cell cell) {
+bool Board::put(Point point, Cell playerType) {
 	if (!pointExists(point)) {
 		return false;
 	} else {
-		theBoard[point.getX()][point.getY()] = cell;
+		theBoard[point.getX()][point.getY()] = playerType;
 		return true;
 	}
 }
