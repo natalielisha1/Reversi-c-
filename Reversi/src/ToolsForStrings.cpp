@@ -13,7 +13,7 @@
  *  chars
  **************************************/
 char *myToString(int number) {
-	int length = 0;
+	int length = 1;
 	int indexer;
 	int *numberInArr;
 	char *charInArr;
@@ -24,10 +24,10 @@ char *myToString(int number) {
 	}
 
 	numberInArr = new int[length];
-	charInArr = new char[length];
+	charInArr = new char[length + 1];
 	tempNumber = number;
 
-	for (indexer = length; indexer >= 0; indexer--) {
+	for (indexer = length - 1; indexer >= 0; indexer--) {
 		numberInArr[indexer] = tempNumber % 10;
 		tempNumber /= 10;
 	}
@@ -35,6 +35,7 @@ char *myToString(int number) {
 	for (indexer = 0; indexer < length; indexer++) {
 		charInArr[indexer] = numberInArr[indexer] + '0';
 	}
+	charInArr[length] = '\0';
 
 	delete [] numberInArr;
 	return charInArr;
