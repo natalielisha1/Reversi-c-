@@ -27,6 +27,32 @@ Game::Game() {
 	currStatus = NotPlaying;
 }
 
+Game::Game(char xPlayerIdentifier, char oPlayerIdentifier) {
+	xLocations = new vector<Point>();
+	oLocations = new vector<Point>();
+
+	gameBoard = new Board(xLocations, oLocations);
+
+	switch (xPlayerIdentifier) {
+		case HUMAN_PLAYER_IDENTIFIER: xPlayer = new HumanPlayer(Board::X);
+									  break;
+		case COMP_PLAYER_IDENTIFIER:  xPlayer = new CompPlayer(Board::X);
+									  break;
+		default:                      xPlayer = new HumanPlayer(Board::X);
+									  break;
+	}
+	switch (oPlayerIdentifier) {
+		case HUMAN_PLAYER_IDENTIFIER: oPlayer = new HumanPlayer(Board::O);
+									  break;
+		case COMP_PLAYER_IDENTIFIER:  oPlayer = new CompPlayer(Board::O);
+									  break;
+		default:                      oPlayer = new HumanPlayer(Board::O);
+									  break;
+	}
+
+	currStatus = NotPlaying;
+}
+
 /***************************************
  * Function Name: ~Game (Destructor)
  * The Input: no input
@@ -66,15 +92,21 @@ void Game::run() {
 		 */
 		vector<Point> *tempOptions;
 		//Printing the board, and letting X play
-		cout << "Current board:" << endl << endl;
-		gameBoard->printBoard();
+		xPlayer->sendMessage("Current board:");
+		xPlayer->sendMessage("");
+		//cout << "Current board:" << endl << endl;
+		xPlayer->sendMessage(gameBoard->boardToString()->c_str());
+		//gameBoard->printBoard();
 		if (move != Point(-1,-1)) {
-			cout << "O played ";
 			++move;//.deAlignToPrint();
-			move.printPoint();
-			cout << endl << endl;
+			string tempString = string("O played ");
+			tempString.append(move.pointToString()->c_str());
+			xPlayer->sendMessage(tempString.c_str());
+			xPlayer->sendMessage("");
+			//move.printPoint();
+			//cout << endl << endl;
 		}
-		cout << "X: It's your move" << endl;
+		xPlayer->sendMessage("X: It's your move");
 		//Calc'ing the moves available to X
 		tempOptions = calcMoves(Board::X);
 		//Letting him choose
@@ -95,15 +127,21 @@ void Game::run() {
 			put(move, Board::X);
 		}
 		//Printing the board, and letting O play
-		cout << "Current board:" << endl << endl;
-		gameBoard->printBoard();
+		oPlayer->sendMessage("Current board:");
+		oPlayer->sendMessage("");
+		//cout << "Current board:" << endl << endl;
+		oPlayer->sendMessage(gameBoard->boardToString()->c_str());
+		//gameBoard->printBoard();
 		if (move != Point(-1,-1)) {
-			cout << "X played ";
 			++move;//.deAlignToPrint();
-			move.printPoint();
-			cout << endl << endl;
+			string tempString = string("X played ");
+			tempString.append(move.pointToString()->c_str());
+			oPlayer->sendMessage(tempString.c_str());
+			oPlayer->sendMessage("");
+			//move.printPoint();
+			//cout << endl << endl;
 		}
-		cout << "O: It's your move" << endl;
+		oPlayer->sendMessage("O: It's your move");
 		//Calc'ing the moves available to O
 		tempOptions = calcMoves(Board::O);
 		//Letting him choose
@@ -126,11 +164,14 @@ void Game::run() {
 	}
 	//Checking if the game is over
 	if (currStatus == XWins) {
-		cout << "X player won!" << endl;
+		xPlayer->sendMessage("X player won!");
+		oPlayer->sendMessage("X player won!");
 	} else if (currStatus == OWins) {
-		cout << "O player won!" << endl;
+		xPlayer->sendMessage("O player won!");
+		oPlayer->sendMessage("O player won!");
 	} else {
-		cout << "It's a tie!" << endl;
+		xPlayer->sendMessage("It's a tie!");
+		oPlayer->sendMessage("It's a tie!");
 	}
 }
 

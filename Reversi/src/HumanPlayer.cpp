@@ -110,3 +110,7 @@ Point HumanPlayer::makeMove(vector<Point> *options) {
 	}
 	return Point(-1, -1);
 }
+
+void HumanPlayer::sendMessage(const char *message) {
+	cout << message << endl;
+}

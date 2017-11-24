@@ -18,6 +18,7 @@ public:
 	Player(Board::Cell type);
 	virtual ~Player() {};
 	virtual Point makeMove(vector<Point> *options) = 0;
+	virtual void sendMessage(const char *message) = 0;
 protected:
 	Board::Cell type;
 };

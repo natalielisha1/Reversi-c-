@@ -18,6 +18,7 @@ public:
 	HumanPlayer(Board::Cell type);
 	~HumanPlayer();
 	virtual Point makeMove(std::vector<Point> *options);
+	virtual void sendMessage(const char *message);
 };
 
 #endif /* HUMANPLAYER_H_ */

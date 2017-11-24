@@ -34,3 +34,7 @@ Point CompPlayer::makeMove(vector<Point> *options) {
 	//Nothing right now...
 	return Point(-1,-1);
 }
+
+void CompPlayer::sendMessage(const char *message) {
+	//Do Nothing - computer can't receive messages
+}

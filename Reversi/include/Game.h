@@ -13,11 +13,16 @@
 #include "Player.h"
 #include "Tools.h"
 #include "HumanPlayer.h"
+#include "CompPlayer.h"
+
+#define HUMAN_PLAYER_IDENTIFIER 'h'
+#define COMP_PLAYER_IDENTIFIER 'c'
 
 class Game {
 public:
 	enum GameStatus { NotPlaying, InProgress, XWins, OWins, Tie };
 	Game();
+	Game(char xPlayerIdentifier, char oPlayerIdentifier);
 	~Game();
 	void run();
 	vector<Point> *calcMoves(Board::Cell cell);
