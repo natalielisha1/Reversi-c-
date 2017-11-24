@@ -53,6 +53,17 @@ Game::Game(char xPlayerIdentifier, char oPlayerIdentifier) {
 	currStatus = NotPlaying;
 }
 
+Game::Game(const Game& other) {
+	xLocations = new vector<Point>(*other.xLocations);
+	oLocations = new vector<Point>(*other.oLocations);
+	xPlayer = new BlankPlayer(Board::X);
+	oPlayer = new BlankPlayer(Board::O);
+
+	gameBoard = new Board(*other.gameBoard);
+
+	currStatus = other.currStatus;
+}
+
 /***************************************
  * Function Name: ~Game (Destructor)
  * The Input: no input
@@ -109,8 +120,9 @@ void Game::run() {
 		xPlayer->sendMessage("X: It's your move");
 		//Calc'ing the moves available to X
 		tempOptions = calcMoves(Board::X);
+		Point bestMove = getBestMove(tempOptions, Board::X);
 		//Letting him choose
-		move = xPlayer->makeMove(tempOptions);
+		move = xPlayer->makeMove(tempOptions, bestMove);
 		delete tempOptions;
 		if (move == Point(-1,-1)) {
 			if (toCheckOther) {
@@ -144,8 +156,9 @@ void Game::run() {
 		oPlayer->sendMessage("O: It's your move");
 		//Calc'ing the moves available to O
 		tempOptions = calcMoves(Board::O);
+		bestMove = getBestMove(tempOptions, Board::O);
 		//Letting him choose
-		move = oPlayer->makeMove(tempOptions);
+		move = oPlayer->makeMove(tempOptions, bestMove);
 		delete tempOptions;
 		if (move == Point(-1,-1)) {
 			if (toCheckOther) {
@@ -395,4 +408,72 @@ Game::GameStatus Game::checkWinning() const {
 	} else {
 		return Tie;
 	}
+}
+
+map<int, Point> Game::rankOptions(vector<Point>* options, Board::Cell cell) {
+	map<int, Point> theMap = map<int, Point>();
+	vector<Point> *currLocations;
+	vector<Point> *advLocations;
+	Board::Cell adv;
+	if (cell == Board::X) {
+		adv = Board::O;
+	} else if (cell == Board::O) {
+		adv = Board::X;
+	}
+	if (options->size() == 0) {
+		return theMap;
+	}
+	for (vector<Point>::iterator it1 = options->begin(); it1 != options->end(); ++it1) {
+		Game imaginaryGame = Game(*this);
+		imaginaryGame.put(*it1, cell);
+		vector<Point> *advOptions = imaginaryGame.calcMoves(adv);
+		for (vector<Point>::iterator it = advOptions->begin(); it != advOptions->end(); ++it) {
+			--(*it);
+		}
+		if (advOptions->size() == 0) {
+			theMap[INT_MIN] = *it1;
+			delete advOptions;
+			continue;
+		}
+		int maxDiff = INT_MIN;
+		for (vector<Point>::iterator it2 = advOptions->begin(); it2 != advOptions->end(); ++it2) {
+			if (*it2 == Point(-1,-1)) {
+				continue;
+			}
+			Game inceptionGame = Game(*this);
+			inceptionGame.put(*it1, cell);
+			inceptionGame.put(*it2, adv);
+			switch (cell) {
+				case Board::X:  currLocations = inceptionGame.xLocations;
+								advLocations = inceptionGame.oLocations;
+								break;
+				case Board::O:  currLocations = inceptionGame.oLocations;
+								advLocations = inceptionGame.xLocations;
+								break;
+				default:		return theMap;
+			}
+
+			int diff = advLocations->size() - currLocations->size();
+			if (diff > maxDiff) {
+				maxDiff = diff;
+			}
+		}
+		theMap[maxDiff] = *it1;
+		delete advOptions;
+	}
+	return theMap;
+}
+
+Point Game::getBestMove(vector<Point>* options, Board::Cell cell) {
+	vector<Point>* optionsCopy = new vector<Point>(*options);
+	for (vector<Point>::iterator it = optionsCopy->begin(); it != optionsCopy->end(); ++it) {
+		--(*it);
+	}
+	map<int, Point> rankedOptions = rankOptions(optionsCopy, cell);
+	delete optionsCopy;
+	Point bestMove = Point(-1,-1);
+	if (!rankedOptions.empty()) {
+		bestMove = (*rankedOptions.begin()).second;
+	}
+	return bestMove;
 }

@@ -85,6 +85,24 @@ Board::Board(vector<Point> *xLocations, vector<Point> *oLocations, int xSize,
 	}
 }
 
+Board::Board(const Board& other) {
+	quantity = other.quantity;
+	theOuterSize = other.theOuterSize;
+	theInnerSize = other.theInnerSize;
+
+	//Memory Initialization
+	theBoard = new Cell *[theOuterSize];
+	for (int indexer = 0; indexer < theOuterSize; indexer++) {
+		theBoard[indexer] = new Cell[theInnerSize];
+	}
+
+	for (int outer = 0; outer < theOuterSize; outer++) {
+		for (int inner = 0; inner < theInnerSize; inner++) {
+			theBoard[outer][inner] = other.theBoard[outer][inner];
+		}
+	}
+}
+
 /***************************************
  * Function Name: ~Board (Destructor)
  * The Input: no input

@@ -8,12 +8,16 @@
 #define GAME_H_
 
 #include <vector>
+#include <map>
+#include <limits.h>
+
 #include "Board.h"
 #include "Point.h"
 #include "Player.h"
 #include "Tools.h"
 #include "HumanPlayer.h"
 #include "CompPlayer.h"
+#include "BlankPlayer.h"
 
 #define HUMAN_PLAYER_IDENTIFIER 'h'
 #define COMP_PLAYER_IDENTIFIER 'c'
@@ -23,6 +27,7 @@ public:
 	enum GameStatus { NotPlaying, InProgress, XWins, OWins, Tie };
 	Game();
 	Game(char xPlayerIdentifier, char oPlayerIdentifier);
+	Game(const Game& other);
 	~Game();
 	void run();
 	vector<Point> *calcMoves(Board::Cell cell);
@@ -39,6 +44,8 @@ private:
 	bool checkMoveEmpty(Board::Cell cell, Point point, Direction dir);
 	GameStatus checkWinning() const;
 	bool tryToPut(Board::Cell, Point point, Direction dir, std::vector<Point> *tempLocations);
+	std::map<int, Point> rankOptions(std::vector<Point> *options, Board::Cell cell);
+	Point getBestMove(vector<Point> *options, Board::Cell cell);
 };
 
 #endif /* GAME_H_ */

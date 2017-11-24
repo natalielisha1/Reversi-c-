@@ -33,13 +33,14 @@ HumanPlayer::~HumanPlayer() {
  *  user to select the move, and
  *  returning the chosen option
  **************************************/
-Point HumanPlayer::makeMove(vector<Point> *options) {
+Point HumanPlayer::makeMove(vector<Point> *options, Point bestMove) {
 	//Using dummies to fix cout/cin issues
 	char dummy;
 	string dummyStr;
 
 	//Clearing previous cin issues
 	cin.clear();
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 	if (options->size() == 0) {
 		//There are no options to choose from
@@ -71,7 +72,8 @@ Point HumanPlayer::makeMove(vector<Point> *options) {
 				//The input was incorrect...
 				cout << "Input against the format, try again" << endl;
 				cin.clear();
-				cin >> dummyStr;
+				//cin >> dummyStr;
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 				continue;
 			}
 			cin >> dummy;
@@ -79,7 +81,8 @@ Point HumanPlayer::makeMove(vector<Point> *options) {
 			if (cin.fail()) {
 				cout << "Input against the format, try again" << endl;
 				cin.clear();
-				cin >> dummyStr;
+				//cin >> dummyStr;
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 				continue;
 			}
 			cout << endl;

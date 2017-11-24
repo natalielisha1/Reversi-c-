@@ -10,6 +10,8 @@
 #include <vector>
 #include <iostream>
 #include <stdio.h>
+#include <limits>
+
 #include "Tools.h"
 #include "Player.h"
 
@@ -17,7 +19,7 @@ class HumanPlayer: public Player {
 public:
 	HumanPlayer(Board::Cell type);
 	~HumanPlayer();
-	virtual Point makeMove(std::vector<Point> *options);
+	virtual Point makeMove(std::vector<Point> *options, Point bestMove);
 	virtual void sendMessage(const char *message);
 };
 

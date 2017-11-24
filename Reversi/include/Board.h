@@ -19,6 +19,7 @@ public:
 	enum Cell { Empty, X, O };
 	Board(int xSize = 8, int ySize = 8);
 	Board(std::vector<Point> *xLocations, std::vector<Point> *oLocations, int xSize = 8, int ySize = 8);
+	Board(const Board& other);
 	~Board();
 	void printBoard() const;
 	bool isCellInPointEmpty(Point p);

@@ -15,7 +15,7 @@ class CompPlayer: public Player {
 public:
 	CompPlayer(Board::Cell type);
 	~CompPlayer();
-	virtual Point makeMove(std::vector<Point> *options);
+	virtual Point makeMove(std::vector<Point> *options, Point bestMove);
 	virtual void sendMessage(const char *message);
 };
 
