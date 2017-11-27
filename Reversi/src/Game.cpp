@@ -27,6 +27,43 @@ Game::Game() {
 	currStatus = NotPlaying;
 }
 
+Game::Game(char xPlayerIdentifier, char oPlayerIdentifier) {
+	xLocations = new vector<Point>();
+	oLocations = new vector<Point>();
+
+	gameBoard = new Board(xLocations, oLocations);
+
+	switch (xPlayerIdentifier) {
+		case HUMAN_PLAYER_IDENTIFIER: xPlayer = new HumanPlayer(Board::X);
+									  break;
+		case COMP_PLAYER_IDENTIFIER:  xPlayer = new CompPlayer(Board::X);
+									  break;
+		default:                      xPlayer = new HumanPlayer(Board::X);
+									  break;
+	}
+	switch (oPlayerIdentifier) {
+		case HUMAN_PLAYER_IDENTIFIER: oPlayer = new HumanPlayer(Board::O);
+									  break;
+		case COMP_PLAYER_IDENTIFIER:  oPlayer = new CompPlayer(Board::O);
+									  break;
+		default:                      oPlayer = new HumanPlayer(Board::O);
+									  break;
+	}
+
+	currStatus = NotPlaying;
+}
+
+Game::Game(const Game& other) {
+	xLocations = new vector<Point>(*other.xLocations);
+	oLocations = new vector<Point>(*other.oLocations);
+	xPlayer = new BlankPlayer(Board::X);
+	oPlayer = new BlankPlayer(Board::O);
+
+	gameBoard = new Board(*other.gameBoard);
+
+	currStatus = other.currStatus;
+}
+
 /***************************************
  * Function Name: ~Game (Destructor)
  * The Input: no input
@@ -66,19 +103,26 @@ void Game::run() {
 		 */
 		vector<Point> *tempOptions;
 		//Printing the board, and letting X play
-		cout << "Current board:" << endl << endl;
-		gameBoard->printBoard();
+		xPlayer->sendMessage("Current board:");
+		xPlayer->sendMessage("");
+		//cout << "Current board:" << endl << endl;
+		xPlayer->sendMessage(gameBoard->boardToString()->c_str());
+		//gameBoard->printBoard();
 		if (move != Point(-1,-1)) {
-			cout << "O played ";
 			++move;//.deAlignToPrint();
-			move.printPoint();
-			cout << endl << endl;
+			string tempString = string("O played ");
+			tempString.append(move.pointToString()->c_str());
+			xPlayer->sendMessage(tempString.c_str());
+			xPlayer->sendMessage("");
+			//move.printPoint();
+			//cout << endl << endl;
 		}
-		cout << "X: It's your move" << endl;
+		xPlayer->sendMessage("X: It's your move");
 		//Calc'ing the moves available to X
 		tempOptions = calcMoves(Board::X);
+		Point bestMove = getBestMove(tempOptions, Board::X);
 		//Letting him choose
-		move = xPlayer->makeMove(tempOptions);
+		move = xPlayer->makeMove(tempOptions, bestMove);
 		delete tempOptions;
 		if (move == Point(-1,-1)) {
 			if (toCheckOther) {
@@ -95,19 +139,26 @@ void Game::run() {
 			put(move, Board::X);
 		}
 		//Printing the board, and letting O play
-		cout << "Current board:" << endl << endl;
-		gameBoard->printBoard();
+		oPlayer->sendMessage("Current board:");
+		oPlayer->sendMessage("");
+		//cout << "Current board:" << endl << endl;
+		oPlayer->sendMessage(gameBoard->boardToString()->c_str());
+		//gameBoard->printBoard();
 		if (move != Point(-1,-1)) {
-			cout << "X played ";
 			++move;//.deAlignToPrint();
-			move.printPoint();
-			cout << endl << endl;
+			string tempString = string("X played ");
+			tempString.append(move.pointToString()->c_str());
+			oPlayer->sendMessage(tempString.c_str());
+			oPlayer->sendMessage("");
+			//move.printPoint();
+			//cout << endl << endl;
 		}
-		cout << "O: It's your move" << endl;
+		oPlayer->sendMessage("O: It's your move");
 		//Calc'ing the moves available to O
 		tempOptions = calcMoves(Board::O);
+		bestMove = getBestMove(tempOptions, Board::O);
 		//Letting him choose
-		move = oPlayer->makeMove(tempOptions);
+		move = oPlayer->makeMove(tempOptions, bestMove);
 		delete tempOptions;
 		if (move == Point(-1,-1)) {
 			if (toCheckOther) {
@@ -126,11 +177,14 @@ void Game::run() {
 	}
 	//Checking if the game is over
 	if (currStatus == XWins) {
-		cout << "X player won!" << endl;
+		xPlayer->sendMessage("X player won!");
+		oPlayer->sendMessage("X player won!");
 	} else if (currStatus == OWins) {
-		cout << "O player won!" << endl;
+		xPlayer->sendMessage("O player won!");
+		oPlayer->sendMessage("O player won!");
 	} else {
-		cout << "It's a tie!" << endl;
+		xPlayer->sendMessage("It's a tie!");
+		oPlayer->sendMessage("It's a tie!");
 	}
 }
 
@@ -354,4 +408,72 @@ Game::GameStatus Game::checkWinning() const {
 	} else {
 		return Tie;
 	}
+}
+
+map<int, Point> Game::rankOptions(vector<Point>* options, Board::Cell cell) {
+	map<int, Point> theMap = map<int, Point>();
+	vector<Point> *currLocations;
+	vector<Point> *advLocations;
+	Board::Cell adv;
+	if (cell == Board::X) {
+		adv = Board::O;
+	} else if (cell == Board::O) {
+		adv = Board::X;
+	}
+	if (options->size() == 0) {
+		return theMap;
+	}
+	for (vector<Point>::iterator it1 = options->begin(); it1 != options->end(); ++it1) {
+		Game imaginaryGame = Game(*this);
+		imaginaryGame.put(*it1, cell);
+		vector<Point> *advOptions = imaginaryGame.calcMoves(adv);
+		for (vector<Point>::iterator it = advOptions->begin(); it != advOptions->end(); ++it) {
+			--(*it);
+		}
+		if (advOptions->size() == 0) {
+			theMap[INT_MIN] = *it1;
+			delete advOptions;
+			continue;
+		}
+		int maxDiff = INT_MIN;
+		for (vector<Point>::iterator it2 = advOptions->begin(); it2 != advOptions->end(); ++it2) {
+			if (*it2 == Point(-1,-1)) {
+				continue;
+			}
+			Game inceptionGame = Game(*this);
+			inceptionGame.put(*it1, cell);
+			inceptionGame.put(*it2, adv);
+			switch (cell) {
+				case Board::X:  currLocations = inceptionGame.xLocations;
+								advLocations = inceptionGame.oLocations;
+								break;
+				case Board::O:  currLocations = inceptionGame.oLocations;
+								advLocations = inceptionGame.xLocations;
+								break;
+				default:		return theMap;
+			}
+
+			int diff = advLocations->size() - currLocations->size();
+			if (diff > maxDiff) {
+				maxDiff = diff;
+			}
+		}
+		theMap[maxDiff] = *it1;
+		delete advOptions;
+	}
+	return theMap;
+}
+
+Point Game::getBestMove(vector<Point>* options, Board::Cell cell) {
+	vector<Point>* optionsCopy = new vector<Point>(*options);
+	for (vector<Point>::iterator it = optionsCopy->begin(); it != optionsCopy->end(); ++it) {
+		--(*it);
+	}
+	map<int, Point> rankedOptions = rankOptions(optionsCopy, cell);
+	delete optionsCopy;
+	Point bestMove = Point(-1,-1);
+	if (!rankedOptions.empty()) {
+		bestMove = (*rankedOptions.begin()).second;
+	}
+	return bestMove;
 }

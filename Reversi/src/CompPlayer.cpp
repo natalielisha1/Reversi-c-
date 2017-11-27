@@ -30,7 +30,11 @@ CompPlayer::~CompPlayer() {
  * The Output: the chosen option
  * The Function Operation: nothing
  **************************************/
-Point CompPlayer::makeMove(vector<Point> *options) {
+Point CompPlayer::makeMove(vector<Point> *options, Point bestMove) {
 	//Nothing right now...
-	return Point(-1,-1);
+	return bestMove;
+}
+
+void CompPlayer::sendMessage(const char *message) {
+	//Do Nothing - computer can't receive messages
 }

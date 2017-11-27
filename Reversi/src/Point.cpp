@@ -14,6 +14,15 @@ using namespace std;
  * The Function Operation: setting
  *  coordinates
  **************************************/
+Point::Point():xLoc(-1), yLoc(-1) {}
+
+/***************************************
+ * Function Name: Point (Constructor)
+ * The Input: x, y coords
+ * The Output: the new point
+ * The Function Operation: setting
+ *  coordinates
+ **************************************/
 Point::Point(int x, int y):xLoc(x), yLoc(y) {}
 
 /***************************************

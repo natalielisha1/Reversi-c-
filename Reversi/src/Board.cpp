@@ -85,6 +85,24 @@ Board::Board(vector<Point> *xLocations, vector<Point> *oLocations, int xSize,
 	}
 }
 
+Board::Board(const Board& other) {
+	quantity = other.quantity;
+	theOuterSize = other.theOuterSize;
+	theInnerSize = other.theInnerSize;
+
+	//Memory Initialization
+	theBoard = new Cell *[theOuterSize];
+	for (int indexer = 0; indexer < theOuterSize; indexer++) {
+		theBoard[indexer] = new Cell[theInnerSize];
+	}
+
+	for (int outer = 0; outer < theOuterSize; outer++) {
+		for (int inner = 0; inner < theInnerSize; inner++) {
+			theBoard[outer][inner] = other.theBoard[outer][inner];
+		}
+	}
+}
+
 /***************************************
  * Function Name: ~Board (Destructor)
  * The Input: no input
@@ -210,11 +228,11 @@ Board::Cell Board::getCell(Point point) {
  *  replacing the cell in that location
  *  with playerType
  **************************************/
-bool Board::put(Point point, Cell cell) {
+bool Board::put(Point point, Cell playerType) {
 	if (!pointExists(point)) {
 		return false;
 	} else {
-		theBoard[point.getX()][point.getY()] = cell;
+		theBoard[point.getX()][point.getY()] = playerType;
 		return true;
 	}
 }
