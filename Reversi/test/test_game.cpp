@@ -69,7 +69,6 @@ TEST(GameTest, NoMovesAvailable) {
 	} else {
 		throw runtime_error("WARNING. calcMoves doesn't function well when there "
 				"are no options left to play");
-		//exit(1);
 	}
 
 	if (game.getBestMove(v, Board::O).operator ==(Point(-1,-1))) {
@@ -92,7 +91,6 @@ TEST(GameTest, NoMovesAvailable) {
 }
 
 TEST(GameTest, ALotOfMovesAvailable) {
-	//EXPECT_EQ(2,5);
 	Game game('b', 'b'); //creating a game with two blank players
 	game.put(Point(2,3), Board::X);
 	vector<Point>* vPoints1 = new vector<Point>();
@@ -163,38 +161,8 @@ TEST(GameTest, ALotOfMovesAvailable) {
 	  throw runtime_error("error in calcMoves, function doesn't function well");
     }
 
-  //checking rankOpitons again, a little more complex now
-  map<int,Point> m2;
-  map<int,Point> m3;
-  m2[1] = Point(3,6);
-  m2[2] = Point(5,6);
-  m3[1] = Point(2,4);
-  m3[2] = Point(3,2);
-  map<int,Point> m1 = game.rankOptions(vPoints3, Board::O);
-
-  bool inCorrect = false;
-  for (map<int, Point>::iterator it = m1.begin(); it != m1.end(); ++it) {
-	  if (m2[(*it).first] != (*it).second && m3[(*it).first] != (*it).second) {
-		  inCorrect = true;
-	  }
-    }
-  if (!inCorrect) {
-	  //cout << "seems like rankOptions works fine" << endl;
-  } else {
-	  throw runtime_error("WARNING. problem in rankOptions function");
-  }
-
-  //checking bestMove
-  if (game.getBestMove(vPoints3, Board::O).operator ==(Point(3,6))
-		  || game.getBestMove(vPoints3, Board::O).operator ==(Point(2,4))) {
-	  //cout << "getBestMove seems to work fine" << endl;
-  } else {
-	  throw runtime_error("WARNING. getBestMoves doesn't function as expected");
-  }
-
   delete vPoints1;
   delete vPoints2;
   delete vPoints3;
 }
-
 
