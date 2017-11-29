@@ -12,13 +12,15 @@
 #include <string>
 #include "Point.h"
 #include "Tools.h"
+#define X_SIZE 8
+#define Y_SIZE 8
 
 class Board {
 public:
 	//Defining what is a "Cell"
 	enum Cell { Empty, X, O };
-	Board(int xSize = 8, int ySize = 8);
-	Board(std::vector<Point> *xLocations, std::vector<Point> *oLocations, int xSize = 8, int ySize = 8);
+	Board(int xSize = X_SIZE, int ySize = Y_SIZE);
+	Board(std::vector<Point> *xLocations, std::vector<Point> *oLocations, int xSize = X_SIZE, int ySize = Y_SIZE);
 	Board(const Board& other);
 	~Board();
 	void printBoard() const;

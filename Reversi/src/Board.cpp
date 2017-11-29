@@ -237,16 +237,45 @@ bool Board::put(Point point, Cell playerType) {
 	}
 }
 
+/***************************************
+ * Function Name: isCellInPointEmpty
+ * The Input: a point
+ * The Output: true or false
+ * The Function Operation: the function
+ * returns true if the current cell in
+ * the given point is empty and false
+ * otherwise.
+ **************************************/
 bool Board::isCellInPointEmpty(Point p) {
-	//TODO: Natalie's Code
-	return false;
+	if (!this->pointExists(p)) {
+		return false;
+	}	else if(theBoard[p.getX()][p.getY()] == Empty) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
+/***************************************
+ * Function Name: getQuantity
+ * The Input: no input
+ * The Output: an integer
+ * The Function Operation: the function
+ * returns the current quantity of full
+ * cells on the board.
+ **************************************/
 int Board::getQuantity() {
 	return quantity;
 }
 
 //Outsider functions
+/***************************************
+ * Function Name: advCellType
+ * The Input: a cell
+ * The Output: the adversary's cell
+ * The Function Operation: the function
+ * returns the adversary's cell
+ **************************************/
 Board::Cell advCellType(Board::Cell cell) {
 	switch (cell) {
 		case Board::X: return Board::O;

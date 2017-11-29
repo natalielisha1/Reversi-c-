@@ -1,7 +1,7 @@
 /***************************************
- * Student Name: Ofek Segal
- * Student ID: 315638288
- * Exercise Name: Ex2
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex3
  **************************************/
 
 #include "Game.h"
@@ -38,6 +38,8 @@ Game::Game(char xPlayerIdentifier, char oPlayerIdentifier) {
 									  break;
 		case COMP_PLAYER_IDENTIFIER:  xPlayer = new CompPlayer(Board::X);
 									  break;
+		case BLANK_PLAYER_IDENTIFIER: xPlayer = new BlankPlayer(Board::X);
+										break;
 		default:                      xPlayer = new HumanPlayer(Board::X);
 									  break;
 	}
@@ -46,6 +48,8 @@ Game::Game(char xPlayerIdentifier, char oPlayerIdentifier) {
 									  break;
 		case COMP_PLAYER_IDENTIFIER:  oPlayer = new CompPlayer(Board::O);
 									  break;
+		case BLANK_PLAYER_IDENTIFIER: oPlayer = new BlankPlayer(Board::O);
+										break;
 		default:                      oPlayer = new HumanPlayer(Board::O);
 									  break;
 	}
@@ -410,6 +414,16 @@ Game::GameStatus Game::checkWinning() const {
 	}
 }
 
+/***************************************
+ * Function Name: rankOptions
+ * The Input: vector of Points (options)
+ * and a type of cell
+ * The Output: a map of rank according
+ * to a specific point and that same point
+ * The Function Operation: the function makes
+ * a list of the rank that defines
+ * every possible move the current player has
+ **************************************/
 map<int, Point> Game::rankOptions(vector<Point>* options, Board::Cell cell) {
 	map<int, Point> theMap = map<int, Point>();
 	vector<Point> *currLocations;
@@ -464,6 +478,15 @@ map<int, Point> Game::rankOptions(vector<Point>* options, Board::Cell cell) {
 	return theMap;
 }
 
+/***************************************
+ * Function Name: getBestMove
+ * The Input: a vector of point (options) and
+ * a cell.
+ * The Output: a point
+ * The Function Operation: the function returns
+ * a point which represents the best move the
+ * current player can do
+ **************************************/
 Point Game::getBestMove(vector<Point>* options, Board::Cell cell) {
 	vector<Point>* optionsCopy = new vector<Point>(*options);
 	for (vector<Point>::iterator it = optionsCopy->begin(); it != optionsCopy->end(); ++it) {
@@ -476,4 +499,16 @@ Point Game::getBestMove(vector<Point>* options, Board::Cell cell) {
 		bestMove = (*rankedOptions.begin()).second;
 	}
 	return bestMove;
+}
+
+/***************************************
+ * Function Name: setCell
+ * The Input: a cell and a point
+ * The Output: no output
+ * The Function Operation: the function
+ * sets the type of the cell at the point
+ * we send to the function
+ **************************************/
+void Game::setCell(Board::Cell cell, Point point) {
+	gameBoard->getCell(point) = cell;
 }

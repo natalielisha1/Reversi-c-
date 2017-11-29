@@ -21,6 +21,7 @@
 
 #define HUMAN_PLAYER_IDENTIFIER 'h'
 #define COMP_PLAYER_IDENTIFIER 'c'
+#define BLANK_PLAYER_IDENTIFIER 'b'
 
 class Game {
 public:
@@ -43,7 +44,8 @@ private:
 	bool checkMove(Board::Cell cell, Point point, Direction dir);
 	bool checkMoveEmpty(Board::Cell cell, Point point, Direction dir);
 	GameStatus checkWinning() const;
-	bool tryToPut(Board::Cell, Point point, Direction dir, std::vector<Point> *tempLocations);
+	bool tryToPut(Board::Cell cell, Point point, Direction dir, std::vector<Point> *tempLocations);
+	void setCell(Board::Cell cell, Point point);
 	std::map<int, Point> rankOptions(std::vector<Point> *options, Board::Cell cell);
 	Point getBestMove(vector<Point> *options, Board::Cell cell);
 };
