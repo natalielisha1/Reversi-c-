@@ -1,9 +1,9 @@
-/*
- * gtest_main.cpp
- *
- *  Created on: Nov 17, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex3
+ **************************************/
+
 #include "gtest/gtest.h"
 
 GTEST_API_ int main(int argc, char **argv) {

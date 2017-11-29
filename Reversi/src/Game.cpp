@@ -109,17 +109,17 @@ void Game::run() {
 		//Printing the board, and letting X play
 		xPlayer->sendMessage("Current board:");
 		xPlayer->sendMessage("");
-		//cout << "Current board:" << endl << endl;
-		xPlayer->sendMessage(gameBoard->boardToString()->c_str());
-		//gameBoard->printBoard();
+		string *boardToString = gameBoard->boardToString();
+		xPlayer->sendMessage(boardToString->c_str());
+		delete boardToString;
 		if (move != Point(-1,-1)) {
 			++move;//.deAlignToPrint();
 			string tempString = string("O played ");
-			tempString.append(move.pointToString()->c_str());
+			string *pointToString = move.pointToString();
+			tempString.append(pointToString->c_str());
+			delete pointToString;
 			xPlayer->sendMessage(tempString.c_str());
 			xPlayer->sendMessage("");
-			//move.printPoint();
-			//cout << endl << endl;
 		}
 		xPlayer->sendMessage("X: It's your move");
 		//Calc'ing the moves available to X
@@ -145,17 +145,17 @@ void Game::run() {
 		//Printing the board, and letting O play
 		oPlayer->sendMessage("Current board:");
 		oPlayer->sendMessage("");
-		//cout << "Current board:" << endl << endl;
-		oPlayer->sendMessage(gameBoard->boardToString()->c_str());
-		//gameBoard->printBoard();
+		boardToString = gameBoard->boardToString();
+		oPlayer->sendMessage(boardToString->c_str());
+		delete boardToString;
 		if (move != Point(-1,-1)) {
 			++move;//.deAlignToPrint();
 			string tempString = string("X played ");
-			tempString.append(move.pointToString()->c_str());
+			string *pointToString = move.pointToString();
+			tempString.append(pointToString->c_str());
+			delete pointToString;
 			oPlayer->sendMessage(tempString.c_str());
 			oPlayer->sendMessage("");
-			//move.printPoint();
-			//cout << endl << endl;
 		}
 		oPlayer->sendMessage("O: It's your move");
 		//Calc'ing the moves available to O
@@ -501,14 +501,6 @@ Point Game::getBestMove(vector<Point>* options, Board::Cell cell) {
 	return bestMove;
 }
 
-/***************************************
- * Function Name: setCell
- * The Input: a cell and a point
- * The Output: no output
- * The Function Operation: the function
- * sets the type of the cell at the point
- * we send to the function
- **************************************/
-void Game::setCell(Board::Cell cell, Point point) {
-	gameBoard->getCell(point) = cell;
+Board*& Game::getGameBoard() {
+	return gameBoard;
 }

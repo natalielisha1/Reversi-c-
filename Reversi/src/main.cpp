@@ -1,7 +1,7 @@
 /***************************************
- * Student Name: Ofek Segal
- * Student ID: 315638288
- * Exercise Name: Ex2
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex3
  **************************************/
 
 #include "Game.h"
@@ -17,11 +17,12 @@
  **************************************/
 int main() {
 	char input;
+	//The menu
 	do {
 		cout << "1 Vs 1 or Player Vs COM?" << endl;
 		cout << "('H' for 1 Vs 1, 'C' for Player Vs COM): ";
-		//char dummy;
-		cin >> input;// >> dummy;
+
+		cin >> input;
 		if (input == 'H') {
 			input = 'h';
 		} else if (input == 'C') {

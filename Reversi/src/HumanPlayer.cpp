@@ -1,7 +1,7 @@
 /***************************************
- * Student Name: Ofek Segal
- * Student ID: 315638288
- * Exercise Name: Ex2
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex3
  **************************************/
 
 #include "HumanPlayer.h"
@@ -36,7 +36,6 @@ HumanPlayer::~HumanPlayer() {
 Point HumanPlayer::makeMove(vector<Point> *options, Point bestMove) {
 	//Using dummies to fix cout/cin issues
 	char dummy;
-	string dummyStr;
 
 	//Clearing previous cin issues
 	cin.clear();
@@ -72,7 +71,6 @@ Point HumanPlayer::makeMove(vector<Point> *options, Point bestMove) {
 				//The input was incorrect...
 				cout << "Input against the format, try again" << endl;
 				cin.clear();
-				//cin >> dummyStr;
 				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 				continue;
 			}
@@ -81,7 +79,6 @@ Point HumanPlayer::makeMove(vector<Point> *options, Point bestMove) {
 			if (cin.fail()) {
 				cout << "Input against the format, try again" << endl;
 				cin.clear();
-				//cin >> dummyStr;
 				cin.ignore(numeric_limits<streamsize>::max(), '\n');
 				continue;
 			}
@@ -114,6 +111,13 @@ Point HumanPlayer::makeMove(vector<Point> *options, Point bestMove) {
 	return Point(-1, -1);
 }
 
+/***************************************
+ * Function Name: sendMessage
+ * The Input: the message
+ * The Output: nothing
+ * The Function Operation: printing
+ *  the message
+ **************************************/
 void HumanPlayer::sendMessage(const char *message) {
 	cout << message << endl;
 }

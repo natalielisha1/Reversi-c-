@@ -1,15 +1,15 @@
-/*
- * Point.h
- *
- *  Created on: Nov 19, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex3
+ **************************************/
 
 #ifndef POINT_H_
 #define POINT_H_
 
 #include <iostream>
 #include <string>
+#include <string.h>
 #include "ToolsForStrings.h"
 
 class Point {

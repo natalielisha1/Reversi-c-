@@ -1,7 +1,7 @@
 /***************************************
- * Student Name: Ofek Segal
- * Student ID: 315638288
- * Exercise Name: Ex2
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex3
  **************************************/
 
 #include "CompPlayer.h"
@@ -35,6 +35,12 @@ Point CompPlayer::makeMove(vector<Point> *options, Point bestMove) {
 	return bestMove;
 }
 
+/***************************************
+ * Function Name: sendMessage
+ * The Input: the message
+ * The Output: nothing
+ * The Function Operation: nothing
+ **************************************/
 void CompPlayer::sendMessage(const char *message) {
 	//Do Nothing - computer can't receive messages
 }

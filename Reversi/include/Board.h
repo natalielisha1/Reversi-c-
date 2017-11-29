@@ -1,7 +1,7 @@
 /***************************************
- * Student Name: Ofek Segal
- * Student ID: 315638288
- * Exercise Name: Ex2
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex3
  **************************************/
 
 #ifndef BOARD_H_
@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <string.h>
 #include "Point.h"
 #include "Tools.h"
 #define X_SIZE 8
@@ -29,6 +30,7 @@ public:
 	bool pointExists(Point point);
 	Cell getCell(Point point);
 	bool put(Point point, Cell playerType);
+	void putClean(Point point, Cell playerType);
 	int getQuantity();
 private:
 	Cell** theBoard;

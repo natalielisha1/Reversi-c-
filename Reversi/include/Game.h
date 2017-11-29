@@ -1,7 +1,7 @@
 /***************************************
- * Student Name: Ofek Segal
- * Student ID: 315638288
- * Exercise Name: Ex2
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex3
  **************************************/
 
 #ifndef GAME_H_
@@ -34,6 +34,10 @@ public:
 	vector<Point> *calcMoves(Board::Cell cell);
 	bool put(Point point, Board::Cell cell);
 	void printBoard() const;
+	Board*& getGameBoard();
+	Point getBestMove(vector<Point> *options, Board::Cell cell);
+	std::map<int, Point> rankOptions(std::vector<Point> *options, Board::Cell cell);
+
 private:
 	Board *gameBoard;
 	Player *xPlayer;
@@ -45,9 +49,6 @@ private:
 	bool checkMoveEmpty(Board::Cell cell, Point point, Direction dir);
 	GameStatus checkWinning() const;
 	bool tryToPut(Board::Cell cell, Point point, Direction dir, std::vector<Point> *tempLocations);
-	void setCell(Board::Cell cell, Point point);
-	std::map<int, Point> rankOptions(std::vector<Point> *options, Board::Cell cell);
-	Point getBestMove(vector<Point> *options, Board::Cell cell);
 };
 
 #endif /* GAME_H_ */

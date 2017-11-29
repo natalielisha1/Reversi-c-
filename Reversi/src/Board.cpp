@@ -161,7 +161,12 @@ string *Board::boardToString() const {
 	string *toReturn = new string();
 	toReturn->append(" | ");
 	for (int counter = 0; counter < theInnerSize; counter++) {
-		toReturn->append(myToString(counter + 1));
+		char *toString = myToString(counter + 1);
+		char *toStringCopy = new char[strlen(toString) + 1];
+		strcpy(toStringCopy, toString);
+		delete[] toString;
+		toReturn->append(toStringCopy);
+		delete[] toStringCopy;
 		toReturn->append(" | ");
 	}
 	toReturn->append("\n");
@@ -169,7 +174,12 @@ string *Board::boardToString() const {
 	toReturn->append("\n");
     //Going through the board, line by line
     for (int outer = 0; outer < theOuterSize; outer++) {
-    	toReturn->append(myToString(outer + 1));
+    	char *toString = myToString(outer + 1);
+			char *toStringCopy = new char[strlen(toString) + 1];
+			strcpy(toStringCopy, toString);
+			delete[] toString;
+			toReturn->append(toStringCopy);
+			delete[] toStringCopy;
     	toReturn->append("| ");
 		for (int inner = 0; inner < theInnerSize; inner++) {
 			//Choosing what to print
@@ -235,6 +245,10 @@ bool Board::put(Point point, Cell playerType) {
 		theBoard[point.getX()][point.getY()] = playerType;
 		return true;
 	}
+}
+
+void Board::putClean(Point point, Cell playerType) {
+	theBoard[point.getX()][point.getY()] = playerType;
 }
 
 /***************************************

@@ -1,7 +1,7 @@
 /***************************************
- * Student Name: Ofek Segal
- * Student ID: 315638288
- * Exercise Name: Ex2
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex3
  **************************************/
 
 #include "Point.h"
@@ -94,9 +94,19 @@ void Point::printPoint() const {
  **************************************/
 string *Point::pointToString() const {
 	string *toReturn = new string("(");
-	toReturn->append(myToString(xLoc));
+	char *toStringX = myToString(xLoc);
+	char *toStringXCopy = new char[strlen(toStringX) + 1];
+	strcpy(toStringXCopy, toStringX);
+	delete[] toStringX;
+	toReturn->append(toStringXCopy);
+	delete[] toStringXCopy;
 	toReturn->append(",");
-	toReturn->append(myToString(yLoc));
+	char *toStringY = myToString(yLoc);
+	char *toStringYCopy = new char[strlen(toStringY) + 1];
+	strcpy(toStringYCopy, toStringY);
+	delete[] toStringY;
+	toReturn->append(toStringYCopy);
+	delete[] toStringYCopy;
 	toReturn->append(")");
 	return toReturn;
 }

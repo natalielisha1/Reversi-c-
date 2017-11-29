@@ -1,9 +1,8 @@
-/*
- * BlankPlayer.h
- *
- *  Created on: Nov 24, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex3
+ **************************************/
 
 #ifndef INCLUDE_BLANKPLAYER_H_
 #define INCLUDE_BLANKPLAYER_H_
