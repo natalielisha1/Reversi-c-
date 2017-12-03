@@ -4,8 +4,8 @@
  * Exercise Name: Ex3
  **************************************/
 
-#ifndef INCLUDE_BLANKPLAYER_H_
-#define INCLUDE_BLANKPLAYER_H_
+#ifndef BLANKPLAYER_H_
+#define BLANKPLAYER_H_
 
 #include <vector>
 
@@ -19,4 +19,4 @@ public:
 	virtual void sendMessage(const char *message);
 };
 
-#endif /* INCLUDE_BLANKPLAYER_H_ */
+#endif /* BLANKPLAYER_H_ */
