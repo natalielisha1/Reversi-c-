@@ -18,10 +18,12 @@
 #include "HumanPlayer.h"
 #include "CompPlayer.h"
 #include "BlankPlayer.h"
+#include "RemotePlayer.h"
 
 #define HUMAN_PLAYER_IDENTIFIER 'h'
 #define COMP_PLAYER_IDENTIFIER 'c'
 #define BLANK_PLAYER_IDENTIFIER 'b'
+#define REMOTE_PLAYER_IDENTIFIER 'r'
 
 class Game {
 public:

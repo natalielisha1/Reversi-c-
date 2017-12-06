@@ -19,6 +19,7 @@ int main() {
 	char input;
 	//The menu
 	do {
+		/*
 		cout << "1 Vs 1 or Player Vs COM?" << endl;
 		cout << "('H' for 1 Vs 1, 'C' for Player Vs COM): ";
 
@@ -29,6 +30,23 @@ int main() {
 			input = 'c';
 		}
 		if (input == 'c' || input == 'h') {
+			break;
+		}
+		*/
+		cout << "Welcome to Reversi!" << endl << endl;
+		cout << "1. a human local player" << endl;
+		cout << "2. an AI player" << endl;
+		cout << "3. a remote player" << endl;
+
+		cin >> input;
+		if (input == '1') {
+			input = HUMAN_PLAYER_IDENTIFIER;
+			break;
+		} else if (input == '2') {
+			input = COMP_PLAYER_IDENTIFIER;
+			break;
+		} else if (input == '3') {
+			input = REMOTE_PLAYER_IDENTIFIER;
 			break;
 		}
 	} while (true);

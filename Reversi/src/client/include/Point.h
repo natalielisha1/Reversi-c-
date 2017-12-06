@@ -10,18 +10,24 @@
 #include <iostream>
 #include <string>
 #include <string.h>
+#include <utility>
 #include "ToolsForStrings.h"
 
 class Point {
 public:
 	Point();
 	Point(int x, int y);
+	Point(std::pair<int, int> thePair);
+
 	int getX() const;
 	int getY() const;
+
 	void setX(int x);
 	void setY(int y);
+
 	void printPoint() const;
 	std::string *pointToString() const;
+
 	bool operator==(const Point& p);
 	bool operator!=(const Point& p);
 	void operator--(); //void alignToPrint();

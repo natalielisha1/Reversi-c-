@@ -25,6 +25,10 @@ Point::Point():xLoc(-1), yLoc(-1) {}
  **************************************/
 Point::Point(int x, int y):xLoc(x), yLoc(y) {}
 
+
+Point::Point(pair<int, int> thePair):xLoc(thePair.first), yLoc(thePair.second) {}
+
+
 /***************************************
  * Function Name: getX
  * The Input: no input

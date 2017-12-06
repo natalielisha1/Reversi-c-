@@ -23,3 +23,11 @@ Player::Player(Board::Cell type): type(type) {}
  *  variables
  **************************************/
 Player::Player(): type(Board::Empty) {}
+
+Board::Cell Player::getType() const {
+	return type;
+}
+
+void Player::setType(Board::Cell newType) {
+	type = newType;
+}

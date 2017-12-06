@@ -16,6 +16,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <string>
+#include <fstream>
+#include <stdexcept>
 
 #define BUFFER_SIZE 2000
 #define RECV_FLAGS 0
@@ -24,11 +26,15 @@
 class Client {
 public:
 	Client(const char *serverIP, int serverPort);
+	Client();
 	~Client();
 
 	void connectToServer();
+	void disconnect();
+
 	int sendMessage(const char *msg);
-	void readMessage();
+	std::string readMessage();
+
 	void waitForCue();
 	int getOrder();
 private:
