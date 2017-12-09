@@ -97,4 +97,3 @@ bool removePointFromVector(vector<Point>* theVector, Point object) {
 	}
 	return false;
 }
-

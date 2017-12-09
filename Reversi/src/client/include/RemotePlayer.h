@@ -9,6 +9,8 @@
 #define REMOTEPLAYER_H_
 
 #include <vector>
+#include <algorithm>
+#include <sstream>
 
 #include "Player.h"
 #include "Client.h"

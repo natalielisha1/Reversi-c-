@@ -39,7 +39,9 @@ Game::Game(char xPlayerIdentifier, char oPlayerIdentifier) {
 		case COMP_PLAYER_IDENTIFIER:  xPlayer = new CompPlayer(Board::X);
 									  break;
 		case BLANK_PLAYER_IDENTIFIER: xPlayer = new BlankPlayer(Board::X);
-										break;
+									  break;
+		case REMOTE_PLAYER_IDENTIFIER:xPlayer = new RemotePlayer(Board::X);
+									  break;
 		default:                      xPlayer = new HumanPlayer(Board::X);
 									  break;
 	}
@@ -49,9 +51,28 @@ Game::Game(char xPlayerIdentifier, char oPlayerIdentifier) {
 		case COMP_PLAYER_IDENTIFIER:  oPlayer = new CompPlayer(Board::O);
 									  break;
 		case BLANK_PLAYER_IDENTIFIER: oPlayer = new BlankPlayer(Board::O);
-										break;
+									  break;
+		case REMOTE_PLAYER_IDENTIFIER:oPlayer = new RemotePlayer(Board::O);
+									  break;
 		default:                      oPlayer = new HumanPlayer(Board::O);
 									  break;
+	}
+
+	if (xPlayerIdentifier == REMOTE_PLAYER_IDENTIFIER) {
+		if (xPlayer->getType() == Board::O) {
+			Player *temp = xPlayer;
+			xPlayer = oPlayer;
+			xPlayer->setType(Board::X);
+			oPlayer = temp;
+		}
+	}
+	if (oPlayerIdentifier == REMOTE_PLAYER_IDENTIFIER) {
+		if (oPlayer->getType() == Board::X) {
+			Player *temp = oPlayer;
+			oPlayer = xPlayer;
+			oPlayer->setType(Board::O);
+			xPlayer = temp;
+		}
 	}
 
 	currStatus = NotPlaying;

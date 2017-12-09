@@ -15,6 +15,9 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
 
 #define MAX_CONNECTED_CLIENTS 10
 #define BUFFER_SIZE 2000
@@ -24,6 +27,7 @@
 class Server {
 public:
 	Server(int port);
+	Server();
 	~Server();
 
 	void start();
