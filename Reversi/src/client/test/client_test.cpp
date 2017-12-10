@@ -2,12 +2,12 @@
  * client_test.cpp
  *
  *  Created on: Dec 3, 2017
- *      Author: ofek286
+ *      Author: Natalie Elisha
  */
 
 #include "gtest/gtest.h"
 #include "Client.h"
-#include "Server.h"
+//#include "Reversi/src/server/include/Server.h" //?
 
 TEST(ClientTest, ConnectionWithServerChecks) {
 //	Server server = Server();
@@ -16,8 +16,14 @@ TEST(ClientTest, ConnectionWithServerChecks) {
 //	try {
 //		server.start();
 //	} catch (const char *msg) {
-//		throw exception("");
+//		throw "Cannot start server. Reason: " << msg ;
+//		exit(1);
 //	}
-//	server.stop();
 
+
+
+
+
+
+//	server.stop();
 }

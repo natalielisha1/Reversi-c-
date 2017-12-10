@@ -65,6 +65,9 @@ TEST(RemotePlayerTest, sendMessageTester) {
 	if (player1.makeMove(tempOptions1, bestMove1) == Point(-1,-1)) {
 		throw runtime_error("something's wrong with sendMessage");
 	}
+
+	delete tempOptions2;
+	delete tempOptions1;
 }
 
 
