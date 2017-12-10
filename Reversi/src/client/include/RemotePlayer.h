@@ -19,6 +19,7 @@ class RemotePlayer: public Player {
 public:
 	RemotePlayer(Board::Cell type);
 	~RemotePlayer();
+	Client getClient();
 
 	virtual Point makeMove(std::vector<Point> *options, Point bestMove);
 	virtual void sendMessage(const char *message);

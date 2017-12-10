@@ -5,5 +5,19 @@
  *      Author: ofek286
  */
 
-#include "/home/ofek286/git/Reversi/Reversi/src/client/include/Client.h"
+#include "gtest/gtest.h"
+#include "Client.h"
+#include "Server.h"
 
+TEST(ClientTest, ConnectionWithServerChecks) {
+//	Server server = Server();
+//	Client c1 = Client("127.0.0.1", 49942);
+//	Client c2 = Client("127.0.0.1", 52672);
+//	try {
+//		server.start();
+//	} catch (const char *msg) {
+//		throw exception("");
+//	}
+//	server.stop();
+
+}

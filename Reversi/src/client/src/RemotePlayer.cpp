@@ -137,3 +137,7 @@ void RemotePlayer::sendMessage(const char* message) {
 		}
 	}
 }
+
+Client RemotePlayer::getClient() {
+	return this->client;
+}

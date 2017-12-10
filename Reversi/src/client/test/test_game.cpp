@@ -64,25 +64,18 @@ TEST(GameTest, NoMovesAvailable) {
 	game.put(Point(5,4), Board::O);
 	game.put(Point(6,4), Board::X);
 	vector<Point>* v = game.calcMoves(Board::O);
-	if (v->size() == 0) {
-		//cout << "seems like calcMoves works just fine" << endl;
-	} else {
+	if (!(v->size() == 0)) {
 		throw runtime_error("WARNING. calcMoves doesn't function well when there "
 				"are no options left to play");
 	}
 
-	if (game.getBestMove(v, Board::O).operator ==(Point(-1,-1))) {
-		//cout << "seems like getBestMove works just fine when there are no"
-				//"options to play" << endl;
-	} else {
+	if (!(game.getBestMove(v, Board::O).operator ==(Point(-1,-1)))) {
 		throw runtime_error("WARNING. getBestMove doesn't function well when there "
 				"are no options left to play");
 	}
 
 	map<int,Point> m = game.rankOptions(v, Board::O);
-	if (m.empty()) {
-		//cout << "rankOptions works well when there are no options for AI player" << endl;
-	} else {
+	if (!m.empty()) {
 		throw runtime_error("WARNING. rankOptions does not function well when there are "
 				"no options left for AI player");
 	}

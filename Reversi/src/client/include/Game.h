@@ -39,6 +39,11 @@ public:
 	Board*& getGameBoard();
 	Point getBestMove(vector<Point> *options, Board::Cell cell);
 	std::map<int, Point> rankOptions(std::vector<Point> *options, Board::Cell cell);
+	GameStatus getCurrentStatus();
+	void setCurrentStatus(GameStatus status);
+	GameStatus checkWinning() const;
+	Player*& getOPlayer();
+	Player*& getXPlayer();
 
 private:
 	Board *gameBoard;
@@ -49,7 +54,6 @@ private:
 	GameStatus currStatus;
 	bool checkMove(Board::Cell cell, Point point, Direction dir);
 	bool checkMoveEmpty(Board::Cell cell, Point point, Direction dir);
-	GameStatus checkWinning() const;
 	bool tryToPut(Board::Cell cell, Point point, Direction dir, std::vector<Point> *tempLocations);
 };
 

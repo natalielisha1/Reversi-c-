@@ -525,3 +525,20 @@ Point Game::getBestMove(vector<Point>* options, Board::Cell cell) {
 Board*& Game::getGameBoard() {
 	return gameBoard;
 }
+
+Game::GameStatus Game::getCurrentStatus() {
+	return this->currStatus;
+}
+
+void Game::setCurrentStatus(Game::GameStatus status) {
+	currStatus = status;
+}
+
+Player*& Game::getOPlayer() {
+	return oPlayer;
+}
+
+Player*& Game::getXPlayer() {
+	return xPlayer;
+}
+
