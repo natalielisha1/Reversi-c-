@@ -10,16 +10,16 @@ using namespace std;
 
 Client::Client(): clientSocket(0) {
 	ifstream serverConfig("server_address.txt");
-	string tempServerIP;
-	serverConfig >> tempServerIP;
-	serverIP = tempServerIP.c_str();
+	//string tempServerIP;
+	serverConfig >> serverIP;
+	//serverIP = tempServerIP.c_str();
 	serverPort = 0;
 	serverConfig >> serverPort;
 
 	serverConfig.close();
 }
 
-Client::Client(const char *serverIP, int serverPort): serverIP(serverIP), serverPort(serverPort), clientSocket(0) {
+Client::Client(string &serverIP, int serverPort): serverIP(serverIP), serverPort(serverPort), clientSocket(0) {
 	//nothing right now
 
 }
@@ -37,7 +37,7 @@ void Client::connectToServer() {
 	// Create a clean structure for the server address
 	bzero((char *)&serverAddress, sizeof(serverAddress));
 	serverAddress.sin_family = AF_INET;
-	serverAddress.sin_addr.s_addr = inet_addr(serverIP);
+	serverAddress.sin_addr.s_addr = inet_addr(serverIP.c_str());
 	serverAddress.sin_port = htons(serverPort);
 	// Establish a connection with the server
 	if (connect(clientSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) {

@@ -93,7 +93,6 @@ void RemotePlayer::sendMessage(const char* message) {
 			}
 		}
 		boardPrinting = false;
-		//client.sendMessage(xMove.c_str());
 		return;
 	}
 	if (msgStr.find(oMove) != string::npos) {
@@ -109,7 +108,6 @@ void RemotePlayer::sendMessage(const char* message) {
 			}
 		}
 		boardPrinting = false;
-		//client.sendMessage(oMove.c_str());
 		return;
 	}
 

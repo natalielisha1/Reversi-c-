@@ -25,7 +25,7 @@
 
 class Client {
 public:
-	Client(const char *serverIP, int serverPort);
+	Client(std::string &serverIP, int serverPort);
 	Client();
 	~Client();
 
@@ -38,7 +38,7 @@ public:
 	void waitForCue();
 	int getOrder();
 private:
-	const char *serverIP;
+	std::string serverIP;
 	int serverPort;
 	int clientSocket;
 	struct sockaddr_in serverAddress;
