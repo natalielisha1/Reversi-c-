@@ -1,10 +1,11 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex3
+ * Exercise Name: Ex4
  **************************************/
 
 #include "CompPlayer.h"
+using namespace std;
 
 /***************************************
  * Function Name: CompPlayer (Constructor)
@@ -26,12 +27,13 @@ CompPlayer::~CompPlayer() {
 
 /***************************************
  * Function Name: makeMove
- * The Input: options to put Cell
- * The Output: the chosen option
- * The Function Operation: nothing
+ * The Input: options to put Cell, and the
+ *  best move
+ * The Output: the best move
+ * The Function Operation: returning the
+ *  best move
  **************************************/
 Point CompPlayer::makeMove(vector<Point> *options, Point bestMove) {
-	//Nothing right now...
 	return bestMove;
 }
 

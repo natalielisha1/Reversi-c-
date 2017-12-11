@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex3
+ * Exercise Name: Ex4
  **************************************/
 
 #ifndef POINT_H_
@@ -37,4 +37,4 @@ private:
 	int yLoc;
 };
 
-#endif /* INCLUDE_POINT_H_ */
+#endif /* POINT_H_ */

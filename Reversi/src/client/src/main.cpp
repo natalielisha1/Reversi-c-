@@ -1,38 +1,26 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex3
+ * Exercise Name: Ex4
  **************************************/
 
 #include "Game.h"
 #include <stdio.h>
 #include <iostream>
 
+using namespace std;
+
 /***************************************
  * Function Name: main
  * The Input: no input
- * The Output: the empty board
- * The Function Operation: creating a
- *  board and printing it
+ * The Output: nothing
+ * The Function Operation: running the
+ *  game
  **************************************/
 int main() {
 	char input;
 	//The menu
 	do {
-		/*
-		cout << "1 Vs 1 or Player Vs COM?" << endl;
-		cout << "('H' for 1 Vs 1, 'C' for Player Vs COM): ";
-
-		cin >> input;
-		if (input == 'H') {
-			input = 'h';
-		} else if (input == 'C') {
-			input = 'c';
-		}
-		if (input == 'c' || input == 'h') {
-			break;
-		}
-		*/
 		cout << "Welcome to Reversi!" << endl << endl;
 		cout << "1. a human local player" << endl;
 		cout << "2. an AI player" << endl;

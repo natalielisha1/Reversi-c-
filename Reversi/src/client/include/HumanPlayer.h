@@ -1,7 +1,7 @@
 /***************************************
- * Student Name: Ofek Segal
- * Student ID: 315638288
- * Exercise Name: Ex2
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex4
  **************************************/
 
 #ifndef HUMANPLAYER_H_
@@ -19,6 +19,7 @@ class HumanPlayer: public Player {
 public:
 	HumanPlayer(Board::Cell type);
 	~HumanPlayer();
+
 	virtual Point makeMove(std::vector<Point> *options, Point bestMove);
 	virtual void sendMessage(const char *message);
 };

@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex3
+ * Exercise Name: Ex4
  **************************************/
 
 #include "Player.h"
@@ -24,10 +24,24 @@ Player::Player(Board::Cell type): type(type) {}
  **************************************/
 Player::Player(): type(Board::Empty) {}
 
+/***************************************
+ * Function Name: getType
+ * The Input: no input
+ * The Output: the player's type
+ * The Function Operation: returning
+ *  the type
+ **************************************/
 Board::Cell Player::getType() const {
 	return type;
 }
 
+/***************************************
+ * Function Name: setType
+ * The Input: the new type
+ * The Output: nothing
+ * The Function Operation: setting the
+ *  type
+ **************************************/
 void Player::setType(Board::Cell newType) {
 	type = newType;
 }

@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex3
+ * Exercise Name: Ex4
  **************************************/
 
 #include "ToolsForStrings.h"
@@ -44,6 +44,17 @@ char *myToString(int number) {
 	return charInArr;
 }
 
+/***************************************
+ * Function Name: replaceStringWithString
+ * The Input: string to replace inside it
+ *            string to find
+ *            string to replace with
+ * The Output: true - successful replacement
+ *             false - otherwise
+ * The Function Operation: finding the
+ *  location of "toReplace" and replacing
+ *  it
+ **************************************/
 bool replaceStringWithString(string& replacee, const string& toReplace, const string& replaceWith) {
 	size_t startPos = replacee.find(toReplace);
 	if (startPos == string::npos) {
@@ -54,6 +65,15 @@ bool replaceStringWithString(string& replacee, const string& toReplace, const st
 	}
 }
 
+/***************************************
+ * Function Name: extractPairFromString
+ * The Input: string to extract from
+ * The Output: the pair
+ * The Function Operation: going through
+ *  the chars and dividing them to x and
+ *  y coords, and returning them as a
+ *  pair of ints
+ **************************************/
 std::pair<int, int> extractPairFromString(std::string& theString) {
 	int x = 0;
 	int y = 0;
@@ -62,6 +82,7 @@ std::pair<int, int> extractPairFromString(std::string& theString) {
 
 	bool yNow = false;
 
+	//Going through the chars until the space chars, and after
 	for (int index = 0; index < theString.size(); index++) {
 		if ('0' <= theString[index] && theString[index] <= '9') {
 			if (!yNow) {
@@ -73,6 +94,7 @@ std::pair<int, int> extractPairFromString(std::string& theString) {
 			yNow = true;
 		}
 	}
+	//Converting strings to ints
 	stringstream xStream(xStr);
 	stringstream yStream(yStr);
 

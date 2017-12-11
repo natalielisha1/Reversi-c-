@@ -1,83 +1,148 @@
-/*
- * Client.cpp
- *
- *  Created on: Dec 3, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex4
+ **************************************/
 
 #include "Client.h"
 using namespace std;
 
+/***************************************
+ * Function Name: Client (Constructor)
+ * The Input: nothing
+ * The Output: the client instance
+ * The Function Operation: initializing
+ *  the client from config file
+ **************************************/
 Client::Client(): clientSocket(0) {
+	//Reading the config file and applying the config
 	ifstream serverConfig("server_address.txt");
-	//string tempServerIP;
 	serverConfig >> serverIP;
-	//serverIP = tempServerIP.c_str();
 	serverPort = 0;
 	serverConfig >> serverPort;
-
+	//Closing the file
 	serverConfig.close();
 }
 
+/***************************************
+ * Function Name: Client (Constructor)
+ * The Input: the server's ip and port
+ * The Output: the client instance
+ * The Function Operation: initializing
+ *  the client
+ **************************************/
 Client::Client(string &serverIP, int serverPort): serverIP(serverIP), serverPort(serverPort), clientSocket(0) {
-	//nothing right now
+	//Nothing right now
 
 }
 
+/***************************************
+ * Function Name: ~Client (Destructor)
+ * The Input: no input
+ * The Output: no output
+ * The Function Operation: nothing
+ **************************************/
 Client::~Client() {
-	//nothing right now
+	//Nothing right now
 }
 
+/***************************************
+ * Function Name: connectToServer
+ * The Input: no input
+ * The Output: nothing
+ * The Function Operation: connecting to
+ *  the server
+ **************************************/
 void Client::connectToServer() {
-	// Create a socket point
+	//Creating a socket pointer
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (clientSocket < 0) {
+		//The socket wasn't created, so we crash
 		throw runtime_error("Error opening socket");
 	}
-	// Create a clean structure for the server address
+	//Cleaning the structure for the server address
 	bzero((char *)&serverAddress, sizeof(serverAddress));
+	//Preparing the server address structure
 	serverAddress.sin_family = AF_INET;
 	serverAddress.sin_addr.s_addr = inet_addr(serverIP.c_str());
 	serverAddress.sin_port = htons(serverPort);
-	// Establish a connection with the server
+	//Establishing a connection with the server
 	if (connect(clientSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) {
+		//The connection failed, so we crash
 		throw runtime_error("Error connecting to server");
 	}
+	//The server is connected
 	cout << "Connected to server" << endl;
 }
 
+/***************************************
+ * Function Name: disconnect
+ * The Input: no input
+ * The Output: nothing
+ * The Function Operation: disconnecting
+ *  from the server
+ **************************************/
 void Client::disconnect() {
 	close(clientSocket);
 }
 
+/***************************************
+ * Function Name: sendMessage
+ * The Input: the message
+ * The Output: the socket's response
+ * The Function Operation: sending the
+ *  message
+ **************************************/
 int Client::sendMessage(const char *msg) {
 	return send(clientSocket, msg, strlen(msg), SEND_FLAGS);
 }
 
+/***************************************
+ * Function Name: readMessage
+ * The Input: no input
+ * The Output: the message
+ * The Function Operation: receiving the
+ *  message and returning it
+ **************************************/
 string Client::readMessage() {
+	//Preparing the string to return
 	string toReturn = string("");
+	//Creating a buffer
 	char buffer[BUFFER_SIZE] = {0};
+	//Creating a var to keep the socket response
 	int readSize;
 	while (true) {
+		//Receiving the message
 		if ((readSize = recv(clientSocket, buffer, BUFFER_SIZE, RECV_FLAGS)) > 0) {
-			//cout << buffer;
+			//Adding the buffer to the string
 			toReturn.append(buffer);
 		}
 		if (readSize != BUFFER_SIZE) {
-			//cout << endl;
+			//If the message is over, return it
 			return toReturn;
 		}
 	}
-	//cout << endl;
 }
 
+/***************************************
+ * Function Name: waitForCue (Experimental)
+ * The Input: no input
+ * The Output: nothing
+ * The Function Operation: waiting to receive
+ *  cue
+ **************************************/
 void Client::waitForCue() {
+	//Creating strings to compare the messages to
 	string cueX = string("X: It's your move");
 	string cueO = string("O: It's your move");
+	//Creating a buffer
 	char buffer[BUFFER_SIZE] = {0};
+	//Creating a var to keep the socket response
 	int readSize;
 	while (true) {
+		//Receiving the message
 		if ((readSize = recv(clientSocket, buffer, BUFFER_SIZE, RECV_FLAGS)) > 0) {
+			//Comparing the cues to the buffer
 			if (strcmp(cueX.c_str(), buffer) == 0) {
 				return;
 			} else if (strcmp(cueO.c_str(), buffer) == 0) {
@@ -87,13 +152,25 @@ void Client::waitForCue() {
 	}
 }
 
+/***************************************
+ * Function Name: getOrder
+ * The Input: no input
+ * The Output: the connection order
+ * The Function Operation: waiting to receive
+ *  order and returning it
+ **************************************/
 int Client::getOrder() {
-	char buffer[BUFFER_SIZE] = {0};
+	//Creating strings to compare the messages to
 	string first = string("1");
 	string second = string("2");
+	//Creating a buffer
+	char buffer[BUFFER_SIZE] = {0};
+	//Creating a var to keep the socket response
 	int readSize;
 	while (true) {
+		//Receiving the message
 		if ((readSize = recv(clientSocket, buffer, BUFFER_SIZE, RECV_FLAGS)) > 0) {
+			//Comparing the strings to the buffer
 			if (strcmp(first.c_str(), buffer) == 0) {
 				return 1;
 			} else if (strcmp(second.c_str(), buffer) == 0) {

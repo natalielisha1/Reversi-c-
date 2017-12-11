@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex3
+ * Exercise Name: Ex4
  **************************************/
 
 #include "BlankPlayer.h"
@@ -32,7 +32,7 @@ BlankPlayer::~BlankPlayer() {
  * The Function Operation: nothing
  **************************************/
 Point BlankPlayer::makeMove(vector<Point> *options, Point bestMove) {
-	//Nothing
+	//Returning nothing
 	return Point(-1,-1);
 }
 

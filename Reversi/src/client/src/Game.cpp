@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex3
+ * Exercise Name: Ex4
  **************************************/
 
 #include "Game.h"
@@ -27,6 +27,14 @@ Game::Game() {
 	currStatus = NotPlaying;
 }
 
+/***************************************
+ * Function Name: Game (Constructor)
+ * The Input: player identifiers
+ * The Output: the game instance
+ * The Function Operation: initializing
+ *  the Cell lists, the board, and the
+ *  players
+ **************************************/
 Game::Game(char xPlayerIdentifier, char oPlayerIdentifier) {
 	xLocations = new vector<Point>();
 	oLocations = new vector<Point>();
@@ -58,6 +66,7 @@ Game::Game(char xPlayerIdentifier, char oPlayerIdentifier) {
 									  break;
 	}
 
+	//If the server placed the players differently, swap them
 	if (xPlayerIdentifier == REMOTE_PLAYER_IDENTIFIER) {
 		if (xPlayer->getType() == Board::O) {
 			Player *temp = xPlayer;
@@ -78,6 +87,14 @@ Game::Game(char xPlayerIdentifier, char oPlayerIdentifier) {
 	currStatus = NotPlaying;
 }
 
+/***************************************
+ * Function Name: Game (Constructor)
+ * The Input: other game
+ * The Output: the game instance
+ * The Function Operation: initializing
+ *  the Cell lists, the board, and the
+ *  players from the other game
+ **************************************/
 Game::Game(const Game& other) {
 	xLocations = new vector<Point>(*other.xLocations);
 	oLocations = new vector<Point>(*other.oLocations);
@@ -438,12 +455,12 @@ Game::GameStatus Game::checkWinning() const {
 /***************************************
  * Function Name: rankOptions
  * The Input: vector of Points (options)
- * and a type of cell
- * The Output: a map of rank according
- * to a specific point and that same point
- * The Function Operation: the function makes
- * a list of the rank that defines
- * every possible move the current player has
+ *  and a type of cell
+ * The Output: a map of ranks according
+ *  to the algorithm
+ * The Function Operation: the function ranks
+ *  every move available, according to the
+ *  adv' moves afterwards
  **************************************/
 map<int, Point> Game::rankOptions(vector<Point>* options, Board::Cell cell) {
 	map<int, Point> theMap = map<int, Point>();
@@ -458,9 +475,12 @@ map<int, Point> Game::rankOptions(vector<Point>* options, Board::Cell cell) {
 	if (options->size() == 0) {
 		return theMap;
 	}
+	//Going through the options
 	for (vector<Point>::iterator it1 = options->begin(); it1 != options->end(); ++it1) {
+		//"Playing" the game with the current move
 		Game imaginaryGame = Game(*this);
 		imaginaryGame.put(*it1, cell);
+		//Checking what are the adv' moves afterwards
 		vector<Point> *advOptions = imaginaryGame.calcMoves(adv);
 		for (vector<Point>::iterator it = advOptions->begin(); it != advOptions->end(); ++it) {
 			--(*it);
@@ -470,6 +490,7 @@ map<int, Point> Game::rankOptions(vector<Point>* options, Board::Cell cell) {
 			delete advOptions;
 			continue;
 		}
+		//Checking what is the best move the adv can do
 		int maxDiff = INT_MIN;
 		for (vector<Point>::iterator it2 = advOptions->begin(); it2 != advOptions->end(); ++it2) {
 			if (*it2 == Point(-1,-1)) {
@@ -493,6 +514,7 @@ map<int, Point> Game::rankOptions(vector<Point>* options, Board::Cell cell) {
 				maxDiff = diff;
 			}
 		}
+		//Adding the current move to the map with it's rank
 		theMap[maxDiff] = *it1;
 		delete advOptions;
 	}
@@ -502,11 +524,11 @@ map<int, Point> Game::rankOptions(vector<Point>* options, Board::Cell cell) {
 /***************************************
  * Function Name: getBestMove
  * The Input: a vector of point (options) and
- * a cell.
+ *  a cell.
  * The Output: a point
  * The Function Operation: the function returns
- * a point which represents the best move the
- * current player can do
+ *  a point which represents the best move the
+ *  current player can do
  **************************************/
 Point Game::getBestMove(vector<Point>* options, Board::Cell cell) {
 	vector<Point>* optionsCopy = new vector<Point>(*options);
@@ -522,23 +544,58 @@ Point Game::getBestMove(vector<Point>* options, Board::Cell cell) {
 	return bestMove;
 }
 
-Board*& Game::getGameBoard() {
+/***************************************
+ * Function Name: getGameBoard
+ * The Input: nothing
+ * The Output: the board
+ * The Function Operation: returning the
+ *  board
+ **************************************/
+Board* Game::getGameBoard() {
 	return gameBoard;
 }
 
-Game::GameStatus Game::getCurrentStatus() {
+/***************************************
+ * Function Name: getCurrentStatus
+ * The Input: nothing
+ * The Output: the game status
+ * The Function Operation: returning the
+ *  status
+ **************************************/
+Game::GameStatus Game::getCurrentStatus() const{
 	return this->currStatus;
 }
 
+/***************************************
+ * Function Name: setCurrentStatus
+ * The Input: new status
+ * The Output: nothing
+ * The Function Operation: setting the
+ *  new status
+ **************************************/
 void Game::setCurrentStatus(Game::GameStatus status) {
 	currStatus = status;
 }
 
-Player*& Game::getOPlayer() {
+/***************************************
+ * Function Name: getOPlayer
+ * The Input: nothing
+ * The Output: the O player
+ * The Function Operation: returning the
+ *  O player
+ **************************************/
+Player* Game::getOPlayer() {
 	return oPlayer;
 }
 
-Player*& Game::getXPlayer() {
+/***************************************
+ * Function Name: getXPlayer
+ * The Input: nothing
+ * The Output: the X player
+ * The Function Operation: returning the
+ *  X player
+ **************************************/
+Player* Game::getXPlayer() {
 	return xPlayer;
 }
 

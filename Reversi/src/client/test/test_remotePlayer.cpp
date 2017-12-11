@@ -1,9 +1,8 @@
-/*
- * remotePlayer_test.cpp
- *
- *  Created on: Dec 3, 2017
- *      Author: Natalie Elisha
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex4
+ **************************************/
 
 #include "Game.h"
 #include "RemotePlayer.h"

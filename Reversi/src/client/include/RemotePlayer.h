@@ -1,9 +1,8 @@
-/*
- * RemotePlayer.h
- *
- *  Created on: Dec 3, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex4
+ **************************************/
 
 #ifndef REMOTEPLAYER_H_
 #define REMOTEPLAYER_H_
@@ -19,7 +18,8 @@ class RemotePlayer: public Player {
 public:
 	RemotePlayer(Board::Cell type);
 	~RemotePlayer();
-	Client getClient();
+
+	Client getClient() const;
 
 	virtual Point makeMove(std::vector<Point> *options, Point bestMove);
 	virtual void sendMessage(const char *message);

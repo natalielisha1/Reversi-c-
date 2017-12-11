@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex3
+ * Exercise Name: Ex4
  **************************************/
 
 #include "Point.h"
@@ -25,7 +25,13 @@ Point::Point():xLoc(-1), yLoc(-1) {}
  **************************************/
 Point::Point(int x, int y):xLoc(x), yLoc(y) {}
 
-
+/***************************************
+ * Function Name: Point (Constructor)
+ * The Input: x, y pair
+ * The Output: the new point
+ * The Function Operation: setting
+ *  coordinates
+ **************************************/
 Point::Point(pair<int, int> thePair):xLoc(thePair.first), yLoc(thePair.second) {}
 
 
@@ -142,25 +148,25 @@ bool Point::operator!=(const Point& p) {
 }
 
 /***************************************
- * Function Name: alignToPrint
+ * Function Name: operator-- (alignToPrint)
  * The Input: no input
  * The Output: no output
  * The Function Operation: changing the
  *  point's range to 0-7 (from 1-8)
  **************************************/
-void Point::operator--() { //void Point::alignToPrint() {
+void Point::operator--() {
 	xLoc--;
 	yLoc--;
 }
 
 /***************************************
- * Function Name: deAlignToPrint
+ * Function Name: operator++ (deAlignToPrint)
  * The Input: no input
  * The Output: no output
  * The Function Operation: changing the
  *  point's range to 1-8 (from 0-7)
  **************************************/
-void Point::operator++() { //void Point::deAlignToPrint() {
+void Point::operator++() {
 	xLoc++;
 	yLoc++;
 }

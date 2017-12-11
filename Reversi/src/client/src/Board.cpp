@@ -1,7 +1,7 @@
 /***************************************
- * Student Name: Ofek Segal
- * Student ID: 315638288
- * Exercise Name: Ex2
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex4
  **************************************/
 
 #include "Board.h"
@@ -85,6 +85,13 @@ Board::Board(vector<Point> *xLocations, vector<Point> *oLocations, int xSize,
 	}
 }
 
+/***************************************
+ * Function Name: Board (Constructor)
+ * The Input: other board
+ * The Output: copy of the board
+ * The Function Operation: copying
+ *  the board
+ **************************************/
 Board::Board(const Board& other) {
 	quantity = other.quantity;
 	theOuterSize = other.theOuterSize;
@@ -288,7 +295,7 @@ int Board::getQuantity() {
  * The Input: a cell
  * The Output: the adversary's cell
  * The Function Operation: the function
- * returns the adversary's cell
+ *  returns the adversary's cell
  **************************************/
 Board::Cell advCellType(Board::Cell cell) {
 	switch (cell) {

@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex3
+ * Exercise Name: Ex4
  **************************************/
 
 #ifndef COMPPLAYER_H_
@@ -15,6 +15,7 @@ class CompPlayer: public Player {
 public:
 	CompPlayer(Board::Cell type);
 	~CompPlayer();
+
 	virtual Point makeMove(std::vector<Point> *options, Point bestMove);
 	virtual void sendMessage(const char *message);
 };

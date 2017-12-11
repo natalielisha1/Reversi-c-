@@ -1,16 +1,25 @@
-/*
- * RemotePlayer.cpp
- *
- *  Created on: Dec 3, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex4
+ **************************************/
 
 #include "RemotePlayer.h"
 using namespace std;
 
+/***************************************
+ * Function Name: RemotePlayer (Constructor)
+ * The Input: the player's type
+ * The Output: the new player
+ * The Function Operation: init'ing the
+ *  client, and getting the player's order
+ **************************************/
 RemotePlayer::RemotePlayer(Board::Cell type): Player(type), client() {
+	//Connecting to the server
 	client.connectToServer();
+	//Waiting for the other player
 	cout << "Waiting for other player to join..." << endl;
+	//Getting the order
 	int order = client.getOrder();
 	if (order == 1) {
 		this->type = Board::O;
@@ -19,27 +28,54 @@ RemotePlayer::RemotePlayer(Board::Cell type): Player(type), client() {
 	}
 }
 
+/***************************************
+ * Function Name: ~RemotePlayer (Destructor)
+ * The Input: no input
+ * The Output: no output
+ * The Function Operation: closing the
+ *  client
+ **************************************/
 RemotePlayer::~RemotePlayer() {
 	client.disconnect();
 }
 
+/***************************************
+ * Function Name: makeMove
+ * The Input: options to put Cell, and the
+ *  best move
+ * The Output: the best move
+ * The Function Operation: returning the
+ *  best move
+ **************************************/
 Point RemotePlayer::makeMove(vector<Point>* options, Point bestMove) {
+	//Waiting for the move
 	cout << "Waiting for other player's move..." << endl;
 
+	//Creating a string to compare to
 	string noMove = "NoMove";
-
+	//Getting the message
 	string moveMsg = client.readMessage();
-	if (strcmp(moveMsg.c_str(), noMove.c_str()) == 0) {
+	if (moveMsg == noMove) {
 		return Point(-1,-1);
 	}
-
+	//Returning the move from the message
 	Point theMove = Point(extractPairFromString(moveMsg));
+	//Aligning the point to the game
 	--theMove;
 
 	return theMove;
 }
 
+/***************************************
+ * Function Name: sendMessage
+ * The Input: the message
+ * The Output: nothing
+ * The Function Operation: checking what
+ *  is the message and sending it when
+ *  required
+ **************************************/
 void RemotePlayer::sendMessage(const char* message) {
+	//Creating strings to compare to and to replace
 	string blank = "";
 	string openBrackets = "(";
 	string closingBrackets = ")";
@@ -58,11 +94,13 @@ void RemotePlayer::sendMessage(const char* message) {
 	string xPlayed = "X played ";
 	string oPlayed = "O played ";
 
+	//Creating vars to know if the message shouldn't be sent
 	static bool boardPrinting = false;
 	static int noMoveCounter = 0;
 
 	string msgStr(message);
 
+	//Checking the message, and reacting accordingly
 	if (msgStr == xWon) {
 		client.sendMessage("END");
 		return;
@@ -80,6 +118,7 @@ void RemotePlayer::sendMessage(const char* message) {
 		boardPrinting = true;
 	}
 
+	//No move was made, so send "NoMove"
 	if (msgStr.find(xMove) != string::npos) {
 		if (boardPrinting) {
 			if (noMoveCounter == 0) {
@@ -111,8 +150,10 @@ void RemotePlayer::sendMessage(const char* message) {
 		return;
 	}
 
+	//The board should be printed locally
 	if (boardPrinting) {
 		string temp = string(message);
+		//The move should be sent
 		if (temp.find(xPlayed) != string::npos) {
 			boardPrinting = false;
 			replaceStringWithString(temp, xPlayed, blank);
@@ -130,12 +171,20 @@ void RemotePlayer::sendMessage(const char* message) {
 			client.sendMessage(temp.c_str());
 			return;
 		} else {
+			//Printing the board locally
 			cout << message << endl;
 			return;
 		}
 	}
 }
 
-Client RemotePlayer::getClient() {
+/***************************************
+ * Function Name: getClient
+ * The Input: the message
+ * The Output: nothing
+ * The Function Operation: returning the
+ *  client
+ **************************************/
+Client RemotePlayer::getClient() const {
 	return this->client;
 }

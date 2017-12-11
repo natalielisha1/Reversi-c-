@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex3
+ * Exercise Name: Ex4
  **************************************/
 
 #include "HumanPlayer.h"
@@ -27,7 +27,8 @@ HumanPlayer::~HumanPlayer() {
 
 /***************************************
  * Function Name: makeMove
- * The Input: options to put Cell
+ * The Input: options to put Cell, and
+ *  the best move
  * The Output: the chosen option
  * The Function Operation: asking the
  *  user to select the move, and
