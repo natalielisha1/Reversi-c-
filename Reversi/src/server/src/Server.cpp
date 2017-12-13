@@ -18,7 +18,32 @@ Server::Server(): serverSocket(0),
 				  clientASock(0),
 				  clientBSock(0),
 				  clientALen(sizeof(struct sockaddr_in)),
-				  clientBLen(sizeof(struct sockaddr_in)) {
+				  clientBLen(sizeof(struct sockaddr_in)),
+				  verbose(false){
+	//Reading the config file and applying the config
+	ifstream serverConfig("server_port.txt");
+	if (!serverConfig.is_open()) {
+		throw runtime_error("File not opening");
+	}
+	port = 0;
+	serverConfig >> port;
+	//Closing the file
+	serverConfig.close();
+}
+
+/***************************************
+ * Function Name: Server (Constructor)
+ * The Input: verbose flag
+ * The Output: the server instance
+ * The Function Operation: initializing
+ *  the server from config file
+ **************************************/
+Server::Server(bool verbose): serverSocket(0),
+				  	  	  	  clientASock(0),
+							  clientBSock(0),
+							  clientALen(sizeof(struct sockaddr_in)),
+							  clientBLen(sizeof(struct sockaddr_in)),
+							  verbose(verbose){
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
 	if (!serverConfig.is_open()) {
@@ -40,7 +65,24 @@ Server::Server(): serverSocket(0),
 Server::Server(int port): port(port), serverSocket(0),
 						  clientASock(0), clientBSock(0),
 						  clientALen(sizeof(struct sockaddr_in)),
-						  clientBLen(sizeof(struct sockaddr_in)){
+						  clientBLen(sizeof(struct sockaddr_in)),
+						  verbose(false){
+	//Nothing right now
+
+}
+
+/***************************************
+ * Function Name: Server (Constructor)
+ * The Input: the port and verbose flag
+ * The Output: the server instance
+ * The Function Operation: initializing
+ *  the server from port input
+ **************************************/
+Server::Server(int port, bool verbose): port(port), serverSocket(0),
+						  	  	  	  	clientASock(0), clientBSock(0),
+										clientALen(sizeof(struct sockaddr_in)),
+										clientBLen(sizeof(struct sockaddr_in)),
+										verbose(verbose){
 	//Nothing right now
 
 }
@@ -169,12 +211,12 @@ bool Server::handleClient(int clientA, char curr, int clientB) {
 			//Client disconnection
 			cout << "Client " << curr << " disconnected" << endl;
 			return false;
-		} else if (strcmp(endConnection.c_str(), buffer) == 0){
+		} else if (strcmp(endConnection.c_str(), buffer) == 0) {
 			//Game ending
 			cout << "Game ended!" << endl;
 			return false;
-		} else {
-			//Do nothing
+		} else if (verbose) {
+			cout << buffer;
 		}
 
 		//Writing the message to the other client
@@ -186,8 +228,48 @@ bool Server::handleClient(int clientA, char curr, int clientB) {
 		}
 		if (writeSize != BUFFER_SIZE) {
 			//The message received completely
+			if (verbose) {
+				cout << endl;
+			}
 			return true;
 		}
 	}
 	return true;
+}
+
+bool Server::sendMessageToClient(int client, string& msg) {
+	int writeSize;
+	writeSize = send(client, msg.c_str(), msg.length(), SEND_FLAGS);
+	if (writeSize == -1) {
+		//Error in writing
+		cout << "Error writing to client" << endl;
+		return false;
+	}
+	return true;
+}
+
+
+//Outsider Functions
+pair<string, vector<string> > extractCommand(string& msg) {
+	string command;
+	vector<string> args;
+	string currentWord = "";
+	bool foundCommand = false;
+
+	if (msg.find(" ") == string::npos) {
+		return make_pair(msg, args);
+	}
+
+	size_t index = 0;
+	while ((index = msg.find(" ") != string::npos)) {
+		currentWord = msg.substr(0, index);
+		if (!foundCommand) {
+			command = currentWord;
+			foundCommand = true;
+		} else {
+			args.push_back(currentWord);
+		}
+	}
+
+	return make_pair(command, args);
 }

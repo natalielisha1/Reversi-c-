@@ -17,21 +17,36 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
+#include <utility>
+
+#include "CommandsManager.h"
+#include "GameInfo.h"
 
 #define MAX_CONNECTED_CLIENTS 10
+
 #define BUFFER_SIZE 2000
+
 #define RECV_FLAGS 0
 #define SEND_FLAGS 0
 
+#define MAX_GAMES 5
+
 class Server {
 public:
-	Server(int port);
 	Server();
+	Server(bool verbose);
+	Server(int port);
+	Server(int port, bool verbose);
 	~Server();
 
 	void start();
 	void stop();
+
+	bool sendMessageToClient(int client, std::string& msg);
 private:
+	bool verbose;
+
 	int port;
 	int serverSocket;
 	struct sockaddr_in server;
@@ -46,4 +61,6 @@ private:
 	bool handleClient(int clientA, char curr, int clientB);
 };
 
+
+std::pair<std::string, std::vector<std::string> > extractCommand(std::string& msg);
 #endif /* SERVER_H_ */

@@ -16,9 +16,16 @@ using namespace std;
  * The Function Operation: running the
  *  server
  **************************************/
-int main() {
+int main(int argc, char *argv[]) {
+	bool verbose = false;
+	if (argc > 1) {
+		string verboseStr = string(argv[1]);
+		if (verboseStr == "-v" || verboseStr == "-V") {
+			verbose = true;
+		}
+	}
 	//Creating the server
-	Server server = Server();
+	Server server = Server(verbose);
 	try {
 		//Running the server
 		server.start();
