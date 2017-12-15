@@ -9,15 +9,14 @@
 
 using namespace std;
 
-DebugCommand::DebugCommand(GameInfo &info, int senderSocket): info(info),
-															  sender(senderSocket) {
+DebugCommand::DebugCommand(GameSet &info): info(info) {
+	//Nothing right now
 }
 
 DebugCommand::~DebugCommand() {
 	//Nothing right now
 }
 
-void DebugCommand::execute(vector<string> args) {
-	string msg = "DEBUG - Not Implemented Yet..";
-	send(sender, msg.c_str(), msg.length(), SEND_FLAGS);
+void DebugCommand::execute(int sender, vector<string> args) {
+	info.debugMessage(sender);
 }

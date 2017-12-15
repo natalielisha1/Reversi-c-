@@ -9,21 +9,20 @@
 #define CLOSECOMMAND_H_
 
 #include "Command.h"
-#include "GameInfo.h"
+#include "GameSet.h"
 
 #include <vector>
 #include <string>
 
 class CloseCommand: public Command {
 public:
-	CloseCommand(GameInfo& info, int senderSocket);
+	CloseCommand(GameSet& info);
 	virtual ~CloseCommand();
 
-	virtual void execute(std::vector<std::string> args);
+	virtual void execute(int sender, std::vector<std::string> args);
 
 private:
-	GameInfo& info;
-	int sender;
+	GameSet& info;
 };
 
 #endif /* CLOSECOMMAND_H_ */

@@ -9,21 +9,20 @@
 #define DEBUGCOMMAND_H_
 
 #include "Command.h"
-#include "GameInfo.h"
+#include "GameSet.h"
 
 #include <vector>
 #include <string>
 
 class DebugCommand: public Command {
 public:
-	DebugCommand(GameInfo& info, int senderSocket);
+	DebugCommand(GameSet& info);
 	virtual ~DebugCommand();
 
-	virtual void execute(std::vector<std::string> args);
+	virtual void execute(int sender, std::vector<std::string> args);
 
 private:
-	GameInfo& info;
-	int sender;
+	GameSet& info;
 };
 
 #endif /* DEBUGCOMMAND_H_ */

@@ -19,6 +19,7 @@ Server::Server(): serverSocket(0),
 				  clientBSock(0),
 				  clientALen(sizeof(struct sockaddr_in)),
 				  clientBLen(sizeof(struct sockaddr_in)),
+				  cmdManager(games),
 				  verbose(false){
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
@@ -43,6 +44,7 @@ Server::Server(bool verbose): serverSocket(0),
 							  clientBSock(0),
 							  clientALen(sizeof(struct sockaddr_in)),
 							  clientBLen(sizeof(struct sockaddr_in)),
+							  cmdManager(games),
 							  verbose(verbose){
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
@@ -66,6 +68,7 @@ Server::Server(int port): port(port), serverSocket(0),
 						  clientASock(0), clientBSock(0),
 						  clientALen(sizeof(struct sockaddr_in)),
 						  clientBLen(sizeof(struct sockaddr_in)),
+						  cmdManager(games),
 						  verbose(false){
 	//Nothing right now
 
@@ -82,6 +85,7 @@ Server::Server(int port, bool verbose): port(port), serverSocket(0),
 						  	  	  	  	clientASock(0), clientBSock(0),
 										clientALen(sizeof(struct sockaddr_in)),
 										clientBLen(sizeof(struct sockaddr_in)),
+										cmdManager(games),
 										verbose(verbose){
 	//Nothing right now
 
@@ -192,7 +196,7 @@ void Server::stop() {
  *  from clientA, checking it, and sending
  *  it to clientB (if required)
  **************************************/
-bool Server::handleClient(int clientA, char curr, int clientB) {
+bool Server::handleClient(int sender, char curr, int reciever) {
 	//Creating string to check for game ending
 	string endConnection = "END";
 	//Creating a buffer
@@ -202,7 +206,7 @@ bool Server::handleClient(int clientA, char curr, int clientB) {
 	int writeSize;
 	while (true) {
 		//Reading the message
-		readSize = recv(clientA, buffer, BUFFER_SIZE, RECV_FLAGS);
+		readSize = recv(sender, buffer, BUFFER_SIZE, RECV_FLAGS);
 		if (readSize == -1) {
 			//Error in receiving
 			cout << "Error reading from client " << curr << endl;
@@ -220,7 +224,7 @@ bool Server::handleClient(int clientA, char curr, int clientB) {
 		}
 
 		//Writing the message to the other client
-		writeSize = send(clientB, buffer, strlen(buffer), SEND_FLAGS);
+		writeSize = send(reciever, buffer, strlen(buffer), SEND_FLAGS);
 		if (writeSize == -1) {
 			//Error in writing
 			cout << endl << "Error writing to client " << curr << endl;
@@ -235,6 +239,38 @@ bool Server::handleClient(int clientA, char curr, int clientB) {
 		}
 	}
 	return true;
+}
+
+bool Server::handleCommand(int client) {
+	//Creating a buffer
+	char buffer[BUFFER_SIZE] = {0};
+	//Keeping the message
+	string msg = "";
+	//Creating vars to keep the sockets' responses
+	int readSize;
+	while (true) {
+		//Reading the message
+		readSize = recv(client, buffer, BUFFER_SIZE, RECV_FLAGS);
+		if (readSize == -1) {
+			//Error in receiving
+			cout << "Error reading from client " << client << endl;
+			return false;
+		} else if (readSize == 0) {
+			//Client disconnection
+			cout << "Client " << client << " disconnected" << endl;
+			return false;
+		} else if (verbose) {
+			cout << buffer;
+		}
+
+		msg.append(buffer);
+
+		if (readSize != BUFFER_SIZE) {
+			break;
+		}
+	}
+	pair<string, vector<string> > cmd = extractCommand(msg);
+	cmdManager.executeCommand(client, cmd.first, cmd.second);
 }
 
 bool Server::sendMessageToClient(int client, string& msg) {

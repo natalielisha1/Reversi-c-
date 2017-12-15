@@ -20,14 +20,14 @@
 #include "PlayCommand.h"
 #include "CloseCommand.h"
 
-#include "GameInfo.h"
+#include "GameSet.h"
 
 class CommandsManager {
 public:
-	CommandsManager(GameInfo& info, int senderSocket);
+	CommandsManager(GameSet& info);
 	~CommandsManager();
 
-	void executeCommand(std::string command, std::vector<std::string> args);
+	void executeCommand(int sender, std::string command, std::vector<std::string> args);
 private:
 	std::map<std::string, Command *> commandsMap;
 };

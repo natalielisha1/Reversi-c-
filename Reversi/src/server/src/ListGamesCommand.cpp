@@ -9,15 +9,14 @@
 
 using namespace std;
 
-ListGamesCommand::ListGamesCommand(GameInfo &info, int senderSocket): info(info),
-		  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  sender(senderSocket) {
+ListGamesCommand::ListGamesCommand(GameSet &info): info(info) {
+	//Nothing right now
 }
 
 ListGamesCommand::~ListGamesCommand() {
 	//Nothing right now
 }
 
-void ListGamesCommand::execute(vector<string> args) {
-	string msg = "list_games - Not Implemented Yet..";
-	send(sender, msg.c_str(), msg.length(), SEND_FLAGS);
+void ListGamesCommand::execute(int sender, vector<string> args) {
+	info.listMatches(sender);
 }

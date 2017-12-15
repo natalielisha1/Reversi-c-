@@ -10,15 +10,12 @@
 
 #include <vector>
 #include <string>
-#include <sys/socket.h>
-
-#define SEND_FLAGS 0
 
 class Command {
 public:
 	virtual ~Command();
 
-	virtual void execute(std::vector<std::string> args) = 0;
+	virtual void execute(int sender, std::vector<std::string> args) = 0;
 };
 
 #endif /* COMMAND_H_ */

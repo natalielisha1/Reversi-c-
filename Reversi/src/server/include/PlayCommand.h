@@ -9,21 +9,20 @@
 #define PLAYCOMMAND_H_
 
 #include "Command.h"
-#include "GameInfo.h"
+#include "GameSet.h"
 
 #include <vector>
 #include <string>
 
 class PlayCommand: public Command {
 public:
-	PlayCommand(GameInfo& info, int senderSocket);
+	PlayCommand(GameSet& info);
 	virtual ~PlayCommand();
 
-	virtual void execute(std::vector<std::string> args);
+	virtual void execute(int sender, std::vector<std::string> args);
 
 private:
-	GameInfo& info;
-	int sender;
+	GameSet& info;
 };
 
 #endif /* PLAYCOMMAND_H_ */

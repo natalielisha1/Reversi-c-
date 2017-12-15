@@ -8,7 +8,8 @@
 #include "GameInfo.h"
 
 GameInfo::GameInfo(): clientA(-1), clientB(-1),
-					  gameName(""), status(GameInfo::ReadyForMatch) {
+					  gameName(""), status(GameInfo::ReadyForMatch),
+					  interrupt(false) {
 	//Nothing right now
 
 }
@@ -41,12 +42,17 @@ void GameInfo::setGameName(const std::string& gameName) {
 	this->gameName = gameName;
 }
 
-GameInfo::MatchStatus GameInfo::getStatus() const {
-	return status;
+GameInfo::MatchStatus GameInfo::getStatus() {
+	pthread_mutex_lock(&statusMutex);
+	GameInfo::MatchStatus toReturn = status;
+	pthread_mutex_unlock(&statusMutex);
+	return toReturn;
 }
 
 void GameInfo::setStatus(GameInfo::MatchStatus status) {
+	pthread_mutex_lock(&statusMutex);
 	this->status = status;
+	pthread_mutex_unlock(&statusMutex);
 }
 
 bool GameInfo::clientInMatch(int client) const {
@@ -64,4 +70,8 @@ int GameInfo::getOtherClient(int firstClient) const {
 
 pthread_mutex_t GameInfo::getStatusMutex() const {
 	return statusMutex;
+}
+
+void GameInfo::setInterrupt(bool interrupt) {
+	this->interrupt = interrupt;
 }

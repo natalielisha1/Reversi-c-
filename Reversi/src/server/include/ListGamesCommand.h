@@ -9,21 +9,20 @@
 #define LISTGAMESCOMMAND_H_
 
 #include "Command.h"
-#include "GameInfo.h"
+#include "GameSet.h"
 
 #include <vector>
 #include <string>
 
 class ListGamesCommand: public Command {
 public:
-	ListGamesCommand(GameInfo& info, int senderSocket);
+	ListGamesCommand(GameSet& info);
 	virtual ~ListGamesCommand();
 
-	virtual void execute(std::vector<std::string> args);
+	virtual void execute(int sender, std::vector<std::string> args);
 
 private:
-	GameInfo& info;
-	int sender;
+	GameSet& info;
 };
 
 #endif /* LISTGAMESCOMMAND_H_ */

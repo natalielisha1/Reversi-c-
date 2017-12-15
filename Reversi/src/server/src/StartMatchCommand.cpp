@@ -9,15 +9,16 @@
 
 using namespace std;
 
-StartMatchCommand::StartMatchCommand(GameInfo &info, int senderSocket): info(info),
-		  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	sender(senderSocket) {
+StartMatchCommand::StartMatchCommand(GameSet &info): info(info) {
+	//Nothing right now
 }
 
 StartMatchCommand::~StartMatchCommand() {
 	//Nothing right now
 }
 
-void StartMatchCommand::execute(vector<string> args) {
-	string msg = "start - Not Implemented Yet..";
-	send(sender, msg.c_str(), msg.length(), SEND_FLAGS);
+void StartMatchCommand::execute(int sender, vector<string> args) {
+	if (args.size() == 1) {
+		info.startNewMatch(sender, args[0]);
+	}
 }

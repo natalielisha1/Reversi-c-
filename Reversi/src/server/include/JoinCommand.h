@@ -9,21 +9,20 @@
 #define JOINCOMMAND_H_
 
 #include "Command.h"
-#include "GameInfo.h"
+#include "GameSet.h"
 
 #include <vector>
 #include <string>
 
 class JoinCommand: public Command {
 public:
-	JoinCommand(GameInfo& info, int senderSocket);
+	JoinCommand(GameSet& info);
 	virtual ~JoinCommand();
 
-	virtual void execute(std::vector<std::string> args);
+	virtual void execute(int sender, std::vector<std::string> args);
 
 private:
-	GameInfo& info;
-	int sender;
+	GameSet& info;
 };
 
 #endif /* JOINCOMMAND_H_ */

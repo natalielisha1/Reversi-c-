@@ -58,7 +58,12 @@ private:
 	socklen_t clientALen;
 	socklen_t clientBLen;
 
-	bool handleClient(int clientA, char curr, int clientB);
+	GameSet games;
+
+	CommandsManager cmdManager;
+
+	bool handleClient(int sender, char curr, int reciever);
+	bool handleCommand(int client);
 };
 
 

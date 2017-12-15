@@ -9,21 +9,20 @@
 #define STARTMATCHCOMMAND_H_
 
 #include "Command.h"
-#include "GameInfo.h"
+#include "GameSet.h"
 
 #include <vector>
 #include <string>
 
 class StartMatchCommand: public Command {
 public:
-	StartMatchCommand(GameInfo& info, int senderSocket);
+	StartMatchCommand(GameSet& info);
 	virtual ~StartMatchCommand();
 
-	virtual void execute(std::vector<std::string> args);
+	virtual void execute(int sender, std::vector<std::string> args);
 
 private:
-	GameInfo& info;
-	int sender;
+	GameSet& info;
 };
 
 #endif /* STARTMATCHCOMMAND_H_ */

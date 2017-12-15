@@ -9,15 +9,14 @@
 
 using namespace std;
 
-CloseCommand::CloseCommand(GameInfo &info, int senderSocket): info(info),
-		  	  	  	  	  	  	  	  	  	  	  	  	  	  sender(senderSocket) {
+CloseCommand::CloseCommand(GameSet &info): info(info) {
+	//Nothing right now
 }
 
 CloseCommand::~CloseCommand() {
 	//Nothing right now
 }
 
-void CloseCommand::execute(vector<string> args) {
-	string msg = "close - Not Implemented Yet..";
-	send(sender, msg.c_str(), msg.length(), SEND_FLAGS);
+void CloseCommand::execute(int sender, vector<string> args) {
+	info.closeMatch(sender);
 }

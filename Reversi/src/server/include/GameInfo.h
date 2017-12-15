@@ -27,7 +27,7 @@ public:
 	const std::string& getGameName() const;
 	void setGameName(const std::string& gameName);
 
-	GameInfo::MatchStatus getStatus() const;
+	GameInfo::MatchStatus getStatus();
 	void setStatus(GameInfo::MatchStatus status);
 
 	bool clientInMatch(int client) const;
@@ -35,13 +35,21 @@ public:
 	int getOtherClient(int firstClient) const;
 
 	pthread_mutex_t getStatusMutex() const;
+
+	void setInterrupt(bool interrupt);
+
 private:
 	std::string gameName;
+
 	int clientA;
 	int clientB;
+
 	GameInfo::MatchStatus status;
 
+	bool interrupt;
+
 	pthread_mutex_t statusMutex;
+	pthread_mutex_t interruptMutex;
 };
 
 #endif /* GAMEINFO_H_ */
