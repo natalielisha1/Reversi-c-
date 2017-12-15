@@ -18,7 +18,5 @@ StartMatchCommand::~StartMatchCommand() {
 }
 
 void StartMatchCommand::execute(int sender, vector<string> args) {
-	if (args.size() == 1) {
-		info.startNewMatch(sender, args[0]);
-	}
+	info.startNewMatch(sender, args);
 }

@@ -18,5 +18,5 @@ CloseCommand::~CloseCommand() {
 }
 
 void CloseCommand::execute(int sender, vector<string> args) {
-	info.closeMatch(sender);
+	info.closeMatch(sender, args);
 }

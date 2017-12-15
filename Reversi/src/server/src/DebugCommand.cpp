@@ -18,5 +18,5 @@ DebugCommand::~DebugCommand() {
 }
 
 void DebugCommand::execute(int sender, vector<string> args) {
-	info.debugMessage(sender);
+	info.debugMessage(sender, args);
 }

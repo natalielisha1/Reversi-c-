@@ -18,7 +18,5 @@ JoinCommand::~JoinCommand() {
 }
 
 void JoinCommand::execute(int sender, vector<string> args) {
-	if (args.size() == 1) {
-		info.joinMatch(sender, args[0]);
-	}
+	info.joinMatch(sender, args);
 }
