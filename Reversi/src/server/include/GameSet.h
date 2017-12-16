@@ -9,6 +9,7 @@
 #define GAMESET_H_
 
 #include "GameInfo.h"
+#include "ToolsForStrings.h"
 
 #include <string>
 #include <map>
@@ -20,10 +21,6 @@
 
 #define SEND_FLAGS 0
 
-//Predefined messages
-#define FIRST_PLAYER_MESSAGE "1"
-#define SECOND_PLAYER_MESSAGE "2"
-
 //Predefined error results
 #define NO_ERROR_RESULT 1
 #define ERROR_GAME_EXISTS_RESULT -1
@@ -33,6 +30,7 @@
 #define ERROR_FAKE_NO_MOVE_RESULT -5
 #define ERROR_GAME_DOES_NOT_EXIST_RESULT -6
 #define ERROR_GAME_FULL_RESULT -7
+#define ERROR_NO_AVAILABLE_SLOT_RESULT -8
 
 class GameSet {
 public:
@@ -80,6 +78,7 @@ private:
 	std::string gameExistsErrorMessage;
 	std::string noArgsErrorMessage;
 	std::string gameFullErrorMessage;
+	std::string noAvailableSlotErrorMessage;
 };
 
 #endif /* GAMESET_H_ */

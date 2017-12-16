@@ -19,6 +19,7 @@ GameSet::GameSet(): lastCommand(GameSet::Debug), lastCommandResult(-1) {
 	gameExistsErrorMessage = string("-1");
 	noArgsErrorMessage = string("-2");
 	gameFullErrorMessage = string("-7");
+	noAvailableSlotErrorMessage = string("-8");
 }
 
 GameSet::~GameSet() {
@@ -26,10 +27,96 @@ GameSet::~GameSet() {
 }
 
 void GameSet::debugMessage(int clientSocket, vector<string> args) {
-
+	string toSend = "";
+	char *toStringResult;
+	if (args.size() == 0) {
+		toSend.append("Last Command: ");
+		toStringResult = myToString(lastCommand);
+		toSend.append(toStringResult);
+		delete[] toStringResult;
+		toSend.append("\n");
+		toSend.append("Last Result: ");
+		toStringResult = myToString(lastCommandResult);
+		toSend.append(toStringResult);
+		delete[] toStringResult;
+		toSend.append("\n");
+		sendMessageToClient(clientSocket, toSend);
+		lastCommand = GameSet::Debug;
+		lastCommandResult = NO_ERROR_RESULT;
+		return;
+	} else {
+		if (args[0] == "find" && args.size() >= 2) {
+			for (int i = 0; i < MAX_GAMES; i++) {
+				if (matches[i].getGameName() == args[1]) {
+					toSend.append("Game ");
+					toSend.append(args[1]);
+					toSend.append(":\n");
+					toSend.append("Status: ");
+					toStringResult = myToString(matches[i].getStatus());
+					toSend.append(toStringResult);
+					delete[] toStringResult;
+					toSend.append("Client A: ");
+					toStringResult = myToString(matches[i].getClientA());
+					toSend.append(toStringResult);
+					delete[] toStringResult;
+					toSend.append("\n");
+					toSend.append("Client B: ");
+					toStringResult = myToString(matches[i].getClientB());
+					toSend.append(toStringResult);
+					sendMessageToClient(clientSocket, toSend);
+					lastCommand = GameSet::Debug;
+					lastCommandResult = NO_ERROR_RESULT;
+					return;
+				}
+			}
+			toSend.append("Game wasn't found");
+			sendMessageToClient(clientSocket, toSend);
+			lastCommand = GameSet::Debug;
+			lastCommandResult = ERROR_GAME_DOES_NOT_EXIST_RESULT;
+			return;
+		}
+	}
+	toSend.append("Invalid args");
+	sendMessageToClient(clientSocket, toSend);
+	lastCommand = GameSet::Debug;
+	lastCommandResult = ERROR_NO_ARGS_RESULT;
 }
 
 void GameSet::startNewMatch(int clientASocket, vector<string> args) {
+	lastCommand = GameSet::Start;
+
+	if (args.size() < 1) {
+		lastCommandResult = ERROR_NO_ARGS_RESULT;
+		sendMessageToClient(clientASocket, noArgsErrorMessage);
+		return;
+	}
+
+	GameInfo *availableGame;
+	bool foundAvailable = false;
+
+	for (int i = 0; i < MAX_GAMES; i++) {
+		if (matches[i].getGameName() == args[0]) {
+			lastCommandResult = ERROR_GAME_EXISTS_RESULT;
+			sendMessageToClient(clientASocket, gameExistsErrorMessage);
+			return;
+		} else if (!foundAvailable && matches[i].getStatus() == GameInfo::ReadyForMatch) {
+			availableGame = &matches[i];
+			foundAvailable = true;
+		}
+	}
+
+	if (!foundAvailable) {
+		lastCommandResult = ERROR_NO_AVAILABLE_SLOT_RESULT;
+		sendMessageToClient(clientASocket, noAvailableSlotErrorMessage);
+		return;
+	}
+
+	availableGame->setClientA(clientASocket);
+	availableGame->setGameName(args[0]);
+	availableGame->setStatus(GameInfo::XWaiting);
+
+	lastCommandResult = NO_ERROR_RESULT;
+	sendMessageToClient(clientASocket, noErrorMessage);
 }
 
 void GameSet::joinMatch(int clientBSocket, vector<string> args) {

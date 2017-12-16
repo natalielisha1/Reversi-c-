@@ -158,6 +158,7 @@ void Server::start() {
 		send(clientASock, order1.c_str(), order1.length(), SEND_FLAGS);
 		send(clientBSock, order2.c_str(), order2.length(), SEND_FLAGS);
 
+		/*
 		//Handling the requests
 		bool ok = true;
 		while (ok) {
@@ -167,6 +168,18 @@ void Server::start() {
 			}
 			ok = handleClient(clientBSock, '2', clientASock);
 		}
+		*/
+
+		//Handling the requests
+		bool ok = true;
+		while (ok) {
+			ok = handleCommand(clientASock);
+			if (!ok) {
+				continue;
+			}
+			ok = handleCommand(clientBSock);
+		}
+
 		//One or both of the clients disconnected, so we start-over
 		close(clientASock);
 		close(clientBSock);
@@ -259,8 +272,6 @@ bool Server::handleCommand(int client) {
 			//Client disconnection
 			cout << "Client " << client << " disconnected" << endl;
 			return false;
-		} else if (verbose) {
-			cout << buffer;
 		}
 
 		msg.append(buffer);
@@ -269,8 +280,12 @@ bool Server::handleCommand(int client) {
 			break;
 		}
 	}
+	if (verbose) {
+		cout << msg << endl;
+	}
 	pair<string, vector<string> > cmd = extractCommand(msg);
 	cmdManager.executeCommand(client, cmd.first, cmd.second);
+	return true;
 }
 
 bool Server::sendMessageToClient(int client, string& msg) {
