@@ -312,7 +312,7 @@ pair<string, vector<string> > extractCommand(string& msg) {
 	}
 
 	size_t index = 0;
-	while ((index = msg.find(" ") != string::npos)) {
+	while ((index = msg.find(" ")) != string::npos) {
 		currentWord = msg.substr(0, index);
 		if (!foundCommand) {
 			command = currentWord;
@@ -320,7 +320,9 @@ pair<string, vector<string> > extractCommand(string& msg) {
 		} else {
 			args.push_back(currentWord);
 		}
+		msg = msg.substr(index + 1);
 	}
+	args.push_back(msg);
 
 	return make_pair(command, args);
 }

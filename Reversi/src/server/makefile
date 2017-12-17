@@ -25,7 +25,7 @@ testD: test
 debugRun: DEBUG = -g
 
 debugRun: clean Server
-	@../../exe/Server
+	@cd ../../exe && gdb --args Server -v
 
 debugTest: DEBUG = -g
 

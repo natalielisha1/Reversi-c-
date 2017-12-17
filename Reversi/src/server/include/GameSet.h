@@ -17,7 +17,7 @@
 #include <iostream>
 #include <vector>
 
-#define MAX_GAMES 5
+//#define MAX_GAMES 5
 
 #define SEND_FLAGS 0
 
@@ -30,7 +30,7 @@
 #define ERROR_FAKE_NO_MOVE_RESULT -5
 #define ERROR_GAME_DOES_NOT_EXIST_RESULT -6
 #define ERROR_GAME_FULL_RESULT -7
-#define ERROR_NO_AVAILABLE_SLOT_RESULT -8
+//#define ERROR_NO_AVAILABLE_SLOT_RESULT -8
 
 class GameSet {
 public:
@@ -60,14 +60,15 @@ public:
 	int getLastCommandResult() const;
 
 private:
-	GameInfo matches[5];
-	std::map<int, int> matchClientMap;
+	//GameInfo matches[5];
+	std::vector<GameInfo *>matches;
+	std::map<int, GameInfo *> matchClientMap;
 	GameSet::CommandOption lastCommand;
 	int lastCommandResult;
 
 	bool sendMessageToClient(int client, std::string& msg);
 
-	int clientExists(int client);
+	GameInfo *clientExists(int client);
 
 	//Regular messages
 	std::string firstPlayerMessage;
@@ -78,7 +79,8 @@ private:
 	std::string gameExistsErrorMessage;
 	std::string noArgsErrorMessage;
 	std::string gameFullErrorMessage;
-	std::string noAvailableSlotErrorMessage;
+	std::string gameDoesNotExistErrorMessage;
+	//std::string noAvailableSlotErrorMessage;
 };
 
 #endif /* GAMESET_H_ */

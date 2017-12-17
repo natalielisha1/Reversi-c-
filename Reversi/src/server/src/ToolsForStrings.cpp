@@ -26,6 +26,7 @@ char *myToString(int number) {
 	if (number < 0) {
 		negative = 1;
 		number *= (-1);
+		tempNumber *= (-1);
 	}
 
 	while ((tempNumber /= 10) > 0) {
@@ -41,8 +42,8 @@ char *myToString(int number) {
 		tempNumber /= 10;
 	}
 
-	for (indexer = negative; indexer < length + negative; indexer++) {
-		charInArr[indexer] = numberInArr[indexer] + '0';
+	for (indexer = 0; indexer < length; indexer++) {
+		charInArr[indexer + negative] = numberInArr[indexer] + '0';
 	}
 	charInArr[length + negative] = '\0';
 	if (negative == 1) {
