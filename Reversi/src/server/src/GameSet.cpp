@@ -27,7 +27,6 @@ GameSet::~GameSet() {
 	for (vector<GameInfo *>::iterator it = matches.begin(); it != matches.end(); ++it) {
 		delete *it;
 	}
-	//Nothing right now
 }
 
 void GameSet::debugMessage(int clientSocket, vector<string> args) {
@@ -260,10 +259,5 @@ GameInfo *GameSet::clientExists(int client) {
 			return it->second;
 		}
 	}
-	return NULL;
-}
-
-GameInfo* GameSet::getGameInfo(int client) {
-	//TODO: WRITE
 	return NULL;
 }
