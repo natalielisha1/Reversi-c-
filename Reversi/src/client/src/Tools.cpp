@@ -88,7 +88,7 @@ bool isPointInVector(vector<Point> *theVector, Point object) {
  *  and if found, removing the point from
  *  the vector
  */
-bool removePointFromVector(vector<Point>* theVector, Point object) {
+bool removePointFromVector(vector<Point> *theVector, Point object) {
 	for (vector<Point>::iterator it = theVector->begin(); it != theVector->end(); ++it) {
 		if (*it == object) {
 			theVector->erase(it);

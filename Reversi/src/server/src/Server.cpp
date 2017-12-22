@@ -98,7 +98,13 @@ Server::Server(int port, bool verbose): port(port), serverSocket(0),
  * The Function Operation: nothing
  **************************************/
 Server::~Server() {
-	//Nothing right now
+	for (map<int, pthread_mutex_t *>::iterator it = threadWaiters.begin(); it != threadWaiters.end(); ++it) {
+		delete (*it).second;
+	}
+
+	for (vector<pthread_t *>::iterator it = gameThreads.begin(); it != gameThreads.end(); ++it) {
+		delete (*it);
+	}
 }
 
 
@@ -299,6 +305,49 @@ bool Server::sendMessageToClient(int client, string& msg) {
 	return true;
 }
 
+void Server::addThread(int client) {
+	pthread_t *newThread = new pthread_t();
+	pthread_mutex_t *newMutex = new pthread_mutex_t();
+
+	pthread_mutex_lock(newMutex);
+	threadWaiters[client] = newMutex;
+
+	gameThreads.push_back(newThread);
+
+	GameInfo *currGame;
+	//TODO: Get currGame
+
+	pair<GameInfo *, pthread_mutex_t *> arg;
+
+	arg = make_pair(currGame, threadWaiters[client]);
+
+	int threadCreateResult = pthread_create(newThread, NULL, gameThreadMain, (void *) &arg);
+
+	if (threadCreateResult) {
+		cout << "Error, thread creating failed" << endl;
+
+		threadWaiters.erase(client);
+		pthread_mutex_unlock(newMutex);
+		delete newMutex;
+
+		removeFromVector(&gameThreads, newThread);
+	}
+}
+
+void *gameThreadMain(void *arg) {
+	pair<GameInfo *, pthread_mutex_t *> fromArg = *((pair<GameInfo *, pthread_mutex_t *>*) arg);
+	GameInfo *currGame = fromArg.first;
+
+	pthread_mutex_t *threadMutex = fromArg.second;
+
+	pthread_mutex_lock(threadMutex);
+	pthread_mutex_unlock(threadMutex);
+
+	//int secondClient
+
+	return NULL;
+}
+
 
 //Outsider Functions
 pair<string, vector<string> > extractCommand(string& msg) {
@@ -312,7 +361,7 @@ pair<string, vector<string> > extractCommand(string& msg) {
 	}
 
 	size_t index = 0;
-	while ((index = msg.find(" ") != string::npos)) {
+	while ((index = msg.find(" ")) != string::npos) {
 		currentWord = msg.substr(0, index);
 		if (!foundCommand) {
 			command = currentWord;
@@ -320,7 +369,9 @@ pair<string, vector<string> > extractCommand(string& msg) {
 		} else {
 			args.push_back(currentWord);
 		}
+		msg = msg.substr(index + 1);
 	}
+	args.push_back(msg);
 
 	return make_pair(command, args);
 }

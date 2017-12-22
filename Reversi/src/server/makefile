@@ -13,7 +13,7 @@ OBJECTS_GTESTS := $(SOURCES_GTESTS:gtest_src/gtest/%.cc=gtest_src/gtest/%.o)
 OBJECTS_TESTS := $(SOURCES_TESTS:test/%.cpp=obj/%.o)
 
 Server: clean $(OBJECTS)
-	g++ $(OBJECTS) $(DEBUG) -o ../../exe/Server
+	g++ $(OBJECTS) $(DEBUG) -o ../../exe/Server -lpthread
 	
 test: clean $(OBJECTS_NO_MAIN) $(OBJECTS_GTESTS) $(OBJECTS_TESTS)
 	g++ $(OBJECTS_NO_MAIN) $(OBJECTS_GTESTS) $(OBJECTS_TESTS) $(DEBUG) -o ../../exe/ServerTest -lpthread
@@ -37,7 +37,7 @@ all: DEBUG = -g
 all: Server
 
 $(OBJECTS): obj/%.o : src/%.cpp
-	g++ -I$(INCLUDES) $(DEBUG) -c $< -o $@
+	g++ -I$(INCLUDES) $(DEBUG) -c $< -o $@ -lpthread
 	
 $(OBJECTS_GTESTS): gtest_src/gtest/%.o : gtest_src/gtest/%.cc
 	g++ -I$(INCLUDES) -I$(INCLUDES_GTESTS) -c $< -o $@ -lpthread

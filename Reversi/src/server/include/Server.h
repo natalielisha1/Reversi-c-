@@ -9,6 +9,7 @@
 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <pthread.h>
 #include <unistd.h>
 #include <string.h>
 #include <iostream>
@@ -18,10 +19,12 @@
 #include <sstream>
 #include <stdexcept>
 #include <vector>
+#include <map>
 #include <utility>
 
 #include "CommandsManager.h"
 #include "GameInfo.h"
+#include "Tools.h"
 
 #define MAX_CONNECTED_CLIENTS 10
 
@@ -59,13 +62,22 @@ private:
 	socklen_t clientBLen;
 
 	GameSet games;
+	pthread_mutex_t gamesMutex;
 
 	CommandsManager cmdManager;
+
+	std::vector<pthread_t *> gameThreads;
+	std::map<int, pthread_mutex_t *> threadWaiters;
+	pthread_mutex_t waitersMapMutex;
+
+	void addThread(int client);
 
 	bool handleClient(int sender, char curr, int reciever);
 	bool handleCommand(int client);
 };
 
-
+//Outsider Functions
 std::pair<std::string, std::vector<std::string> > extractCommand(std::string& msg);
+void *gameThreadMain(void *arg);
+
 #endif /* SERVER_H_ */
