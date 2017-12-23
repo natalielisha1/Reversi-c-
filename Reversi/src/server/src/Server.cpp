@@ -15,12 +15,8 @@ using namespace std;
  *  the server from config file
  **************************************/
 Server::Server(): serverSocket(0),
-				  clientASock(0),
-				  clientBSock(0),
-				  clientALen(sizeof(struct sockaddr_in)),
-				  clientBLen(sizeof(struct sockaddr_in)),
-				  cmdManager(games),
-				  verbose(false){
+				  	  	  	  cmdManager(games),
+				  	  	  	  verbose(false) {
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
 	if (!serverConfig.is_open()) {
@@ -30,6 +26,8 @@ Server::Server(): serverSocket(0),
 	serverConfig >> port;
 	//Closing the file
 	serverConfig.close();
+	pthread_mutex_init(&gamesMutex, NULL);
+	pthread_mutex_init(&verboseMutex, NULL);
 }
 
 /***************************************
@@ -40,12 +38,8 @@ Server::Server(): serverSocket(0),
  *  the server from config file
  **************************************/
 Server::Server(bool verbose): serverSocket(0),
-				  	  	  	  clientASock(0),
-							  clientBSock(0),
-							  clientALen(sizeof(struct sockaddr_in)),
-							  clientBLen(sizeof(struct sockaddr_in)),
-							  cmdManager(games),
-							  verbose(verbose){
+							  	  	  	  	  	  	  cmdManager(games),
+							  	  	  	  	  	  	  	verbose(verbose) {
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
 	if (!serverConfig.is_open()) {
@@ -55,6 +49,8 @@ Server::Server(bool verbose): serverSocket(0),
 	serverConfig >> port;
 	//Closing the file
 	serverConfig.close();
+	pthread_mutex_init(&gamesMutex, NULL);
+	pthread_mutex_init(&verboseMutex, NULL);
 }
 
 /***************************************
@@ -65,13 +61,10 @@ Server::Server(bool verbose): serverSocket(0),
  *  the server from port input
  **************************************/
 Server::Server(int port): port(port), serverSocket(0),
-						  clientASock(0), clientBSock(0),
-						  clientALen(sizeof(struct sockaddr_in)),
-						  clientBLen(sizeof(struct sockaddr_in)),
-						  cmdManager(games),
-						  verbose(false){
-	//Nothing right now
-
+						  	  	  	  	  	  cmdManager(games),
+						  	  	  	  	  	  verbose(false){
+	pthread_mutex_init(&gamesMutex, NULL);
+	pthread_mutex_init(&verboseMutex, NULL);
 }
 
 /***************************************
@@ -82,13 +75,10 @@ Server::Server(int port): port(port), serverSocket(0),
  *  the server from port input
  **************************************/
 Server::Server(int port, bool verbose): port(port), serverSocket(0),
-						  	  	  	  	clientASock(0), clientBSock(0),
-										clientALen(sizeof(struct sockaddr_in)),
-										clientBLen(sizeof(struct sockaddr_in)),
-										cmdManager(games),
-										verbose(verbose){
-	//Nothing right now
-
+																		 cmdManager(games),
+																		 verbose(verbose){
+	pthread_mutex_init(&gamesMutex, NULL);
+	pthread_mutex_init(&verboseMutex, NULL);
 }
 
 /***************************************
@@ -98,10 +88,6 @@ Server::Server(int port, bool verbose): port(port), serverSocket(0),
  * The Function Operation: nothing
  **************************************/
 Server::~Server() {
-	for (map<int, pthread_mutex_t *>::iterator it = threadWaiters.begin(); it != threadWaiters.end(); ++it) {
-		delete (*it).second;
-	}
-
 	for (vector<pthread_t *>::iterator it = gameThreads.begin(); it != gameThreads.end(); ++it) {
 		delete (*it);
 	}
@@ -135,60 +121,37 @@ void Server::start() {
 	//Starting listening to incoming connections
 	listen(serverSocket, MAX_CONNECTED_CLIENTS);
 
+	//Waiting for the clients to connect
+	cout << "Waiting for client connections..." << endl;
+
 	while (true) {
-		//Cleaning the clients' info structures
-		bzero((void *)&clientA, sizeof(clientA));
-		bzero((void *)&clientB, sizeof(clientB));
-		//Waiting for the clients to connect
-		cout << "Waiting for client connections..." << endl;
-		//Connecting the first client
-		clientASock = accept(serverSocket, (struct sockaddr *)&clientA, (socklen_t*)&clientALen);
-		if (clientASock == -1) {
+		int currClientSocket;
+		struct sockaddr_in currClient;
+		socklen_t clientLen = sizeof(struct sockaddr_in);
+		//Cleaning the client's info structure
+		bzero((void *)&currClient, sizeof(currClient));
+
+		//Connecting the current client
+		currClientSocket = accept(serverSocket, (struct sockaddr *)&currClient, (socklen_t*)&clientLen);
+		if (currClientSocket == -1) {
 			//The first client's connection failed, so we crash
-			throw "Error on accept 1";
+			cout << "Error on accept" << endl;
+			continue;
 		}
-		//The first client connected
-		cout << "Client 1 connected" << endl;
-		//Connecting the second client
-		clientBSock = accept(serverSocket, (struct sockaddr *)&clientB, (socklen_t*)&clientBLen);
-		if (clientBSock == -1) {
-			//The second client's connection failed, so we crash
-			close(clientASock);
-			throw "Error on accept B";
-		}
-		//The second client connected
-		cout << "Client 2 connected" << endl;
-		//Sending the clients their orders
-		string order1 = "1";
-		string order2 = "2";
-		send(clientASock, order1.c_str(), order1.length(), SEND_FLAGS);
-		send(clientBSock, order2.c_str(), order2.length(), SEND_FLAGS);
-
-		/*
-		//Handling the requests
-		bool ok = true;
-		while (ok) {
-			ok = handleClient(clientASock, '1', clientBSock);
-			if (!ok) {
-				continue;
-			}
-			ok = handleClient(clientBSock, '2', clientASock);
-		}
-		*/
 
 		//Handling the requests
 		bool ok = true;
 		while (ok) {
-			ok = handleCommand(clientASock);
-			if (!ok) {
-				continue;
+			ok = handleCommand(currClientSocket);
+			if (!ok || (games.getLastCommand() == GameSet::Start &&
+								 games.getLastCommandResult() == NO_ERROR_RESULT)) {
+				ok = false;
+			} else if (games.getLastCommand() == GameSet::Join &&
+								games.getLastCommandResult() == NO_ERROR_RESULT) {
+				addThread(currClientSocket);
+				ok = false;
 			}
-			ok = handleCommand(clientBSock);
 		}
-
-		//One or both of the clients disconnected, so we start-over
-		close(clientASock);
-		close(clientBSock);
 	}
 }
 
@@ -238,7 +201,7 @@ bool Server::handleClient(int sender, char curr, int reciever) {
 			//Game ending
 			cout << "Game ended!" << endl;
 			return false;
-		} else if (verbose) {
+		} else if (getVerbose()) {
 			cout << buffer;
 		}
 
@@ -251,7 +214,7 @@ bool Server::handleClient(int sender, char curr, int reciever) {
 		}
 		if (writeSize != BUFFER_SIZE) {
 			//The message received completely
-			if (verbose) {
+			if (getVerbose()) {
 				cout << endl;
 			}
 			return true;
@@ -286,7 +249,7 @@ bool Server::handleCommand(int client) {
 			break;
 		}
 	}
-	if (verbose) {
+	if (getVerbose()) {
 		cout << msg << endl;
 	}
 	pair<string, vector<string> > cmd = extractCommand(msg);
@@ -307,49 +270,70 @@ bool Server::sendMessageToClient(int client, string& msg) {
 
 void Server::addThread(int client) {
 	pthread_t *newThread = new pthread_t();
-	pthread_mutex_t *newMutex = new pthread_mutex_t();
-
-	pthread_mutex_lock(newMutex);
-	threadWaiters[client] = newMutex;
 
 	gameThreads.push_back(newThread);
 
-	GameInfo *currGame;
-	//TODO: Get currGame
+	GameInfo *currGame = games.getGameInfo(client);
 
-	pair<GameInfo *, pthread_mutex_t *> arg;
+//	pair<GameInfo *, Server *> arg;
+//
+//	arg = make_pair(currGame, this);
 
-	arg = make_pair(currGame, threadWaiters[client]);
+	lastUsedGame = currGame;
 
-	int threadCreateResult = pthread_create(newThread, NULL, gameThreadMain, (void *) &arg);
+	int threadCreateResult = pthread_create(newThread, NULL, gameThreadMain, (void *) this);
 
 	if (threadCreateResult) {
 		cout << "Error, thread creating failed" << endl;
 
-		threadWaiters.erase(client);
-		pthread_mutex_unlock(newMutex);
-		delete newMutex;
-
 		removeFromVector(&gameThreads, newThread);
+		int other = currGame->getOtherClient(client);
+		string endGame = string("END");
+		sendMessageToClient(client, endGame);
+		sendMessageToClient(other, endGame);
 	}
 }
 
+bool Server::getVerbose() {
+	pthread_mutex_lock(&verboseMutex);
+	bool toReturn = verbose;
+	pthread_mutex_unlock(&verboseMutex);
+	return toReturn;
+}
+
+//Outsider Functions
 void *gameThreadMain(void *arg) {
-	pair<GameInfo *, pthread_mutex_t *> fromArg = *((pair<GameInfo *, pthread_mutex_t *>*) arg);
-	GameInfo *currGame = fromArg.first;
+//	pair<GameInfo *, Server *> fromArg;
+//	fromArg = *(pair<GameInfo *, Server *> *) arg;
+//
+//	GameInfo *currGame = fromArg.first;
 
-	pthread_mutex_t *threadMutex = fromArg.second;
+	Server *theServer = (Server *) arg;
+	GameInfo *currGame = theServer->lastUsedGame;
 
-	pthread_mutex_lock(threadMutex);
-	pthread_mutex_unlock(threadMutex);
+	int firstClient = currGame->getClientA();
+	int secondClient = currGame->getClientB();
 
-	//int secondClient
+	bool ok = true;
+
+	int currClient = firstClient;
+
+	while (ok) {
+		bool ok = theServer->handleCommand(currClient);
+		if (!ok) {
+			theServer->games.removeGame(currGame);
+			return NULL;
+		}
+		if (currGame->getInterrupt() == true) {
+			theServer->games.removeGame(currGame);
+			return NULL;
+		}
+		currClient = (currClient == firstClient) ? secondClient : firstClient;
+	}
 
 	return NULL;
 }
 
-
-//Outsider Functions
 pair<string, vector<string> > extractCommand(string& msg) {
 	string command;
 	vector<string> args;

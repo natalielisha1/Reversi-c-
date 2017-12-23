@@ -1,5 +1,5 @@
 /*
- * GameInfo.h
+f * GameInfo.h
  *
  *  Created on: Dec 13, 2017
  *      Author: ofek286
@@ -18,24 +18,25 @@ public:
 	GameInfo();
 	~GameInfo();
 
-	int getClientA() const;
-	void setClientA(int clientA);
+	int getClientA();
+	void setClientA(int newClient);
 
-	int getClientB() const;
-	void setClientB(int clientB);
+	int getClientB();
+	void setClientB(int newClient);
 
-	const std::string& getGameName() const;
-	void setGameName(const std::string& gameName);
+	const std::string& getGameName();
+	void setGameName(const std::string& name);
 
 	GameInfo::MatchStatus getStatus();
-	void setStatus(GameInfo::MatchStatus status);
+	void setStatus(GameInfo::MatchStatus newStatus);
 
-	bool clientInMatch(int client) const;
+	bool clientInMatch(int client);
 
-	int getOtherClient(int firstClient) const;
+	int getOtherClient(int firstClient);
 
-	pthread_mutex_t getStatusMutex() const;
+	//pthread_mutex_t getStatusMutex() const;
 
+	bool getInterrupt();
 	void setInterrupt(bool interrupt);
 
 private:
@@ -50,6 +51,9 @@ private:
 
 	pthread_mutex_t statusMutex;
 	pthread_mutex_t interruptMutex;
+	pthread_mutex_t nameMutex;
+	pthread_mutex_t clientAMutex;
+	pthread_mutex_t clientBMutex;
 };
 
 #endif /* GAMEINFO_H_ */

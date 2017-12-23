@@ -47,19 +47,22 @@ public:
 	void stop();
 
 	bool sendMessageToClient(int client, std::string& msg);
+
+	friend void *gameThreadMain(void *arg);
 private:
 	bool verbose;
+	pthread_mutex_t verboseMutex;
 
 	int port;
 	int serverSocket;
 	struct sockaddr_in server;
 
-	int clientASock;
-	int clientBSock;
-	struct sockaddr_in clientA;
-	struct sockaddr_in clientB;
-	socklen_t clientALen;
-	socklen_t clientBLen;
+	//int clientASock;
+	//int clientBSock;
+	//struct sockaddr_in clientA;
+	//struct sockaddr_in clientB;
+	//socklen_t clientALen;
+	//socklen_t clientBLen;
 
 	GameSet games;
 	pthread_mutex_t gamesMutex;
@@ -67,13 +70,15 @@ private:
 	CommandsManager cmdManager;
 
 	std::vector<pthread_t *> gameThreads;
-	std::map<int, pthread_mutex_t *> threadWaiters;
-	pthread_mutex_t waitersMapMutex;
+
+	GameInfo *lastUsedGame;
 
 	void addThread(int client);
 
 	bool handleClient(int sender, char curr, int reciever);
 	bool handleCommand(int client);
+
+	bool getVerbose();
 };
 
 //Outsider Functions

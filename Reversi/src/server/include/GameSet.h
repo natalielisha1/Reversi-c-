@@ -10,12 +10,15 @@
 
 #include "GameInfo.h"
 #include "ToolsForStrings.h"
+#include "Tools.h"
 
 #include <string>
 #include <map>
 #include <sys/socket.h>
 #include <iostream>
 #include <vector>
+#include <pthread.h>
+#include <unistd.h>
 
 //#define MAX_GAMES 5
 
@@ -60,20 +63,26 @@ public:
 	int getLastCommandResult() const;
 
 	GameInfo *getGameInfo(int client);
+
+	bool removeGame(GameInfo *currGame);
 private:
 	//GameInfo matches[5];
 	std::vector<GameInfo *>matches;
 	std::map<int, GameInfo *> matchClientMap;
 	GameSet::CommandOption lastCommand;
 	int lastCommandResult;
+	pthread_mutex_t matchesMutex;
+	pthread_mutex_t clientMapMutex;
+	pthread_mutex_t stringsMutex;
 
 	bool sendMessageToClient(int client, std::string& msg);
 
-	GameInfo *clientExists(int client);
+	//GameInfo *clientExists(int client);
 
 	//Regular messages
 	std::string firstPlayerMessage;
 	std::string secondPlayerMessage;
+	std::string endGameMessage;
 
 	//Error messages
 	std::string noErrorMessage;
