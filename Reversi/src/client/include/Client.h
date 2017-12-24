@@ -17,8 +17,14 @@
 #include <string>
 #include <fstream>
 #include <stdexcept>
+#include <ctime>
+
+#include "ToolsForStrings.h"
 
 #define BUFFER_SIZE 2000
+#define SHORT_BUFFER_SIZE 3
+#define REALLY_SHORT_BUFFER_SIZE 2
+
 #define RECV_FLAGS 0
 #define SEND_FLAGS 0
 
@@ -33,14 +39,22 @@ public:
 
 	int sendMessage(const char *msg);
 	std::string readMessage();
+	std::string readShortMessage();
 
 	void waitForCue();
 	int getOrder();
+
+	std::string genUniqueGameIdentifier();
+
+	const std::string& getGameName() const;
+	void setGameName(const std::string& newName);
 private:
 	std::string serverIP;
 	int serverPort;
 	int clientSocket;
 	struct sockaddr_in serverAddress;
+
+	std::string gameName;
 };
 
 #endif /* CLIENT_H_ */

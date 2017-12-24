@@ -113,3 +113,22 @@ std::pair<int, int> extractPairFromString(std::string& theString) {
 
 	return make_pair(x,y);
 }
+
+vector<string> splitString(string& toSplit, char splitter) {
+	vector<string> toReturn;
+	char temp[2] = {0};
+
+	string curr = "";
+	for (int i = 0; i < toSplit.length(); i++) {
+		if (toSplit[i] == splitter) {
+			toReturn.push_back(curr);
+			curr = "";
+			continue;
+		}
+		temp[0] = toSplit[i];
+		curr.append(temp);
+	}
+	toReturn.push_back(curr);
+
+	return toReturn;
+}

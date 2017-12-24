@@ -13,6 +13,7 @@
 
 #include "Player.h"
 #include "Client.h"
+#include "ToolsForStrings.h"
 
 class RemotePlayer: public Player {
 public:

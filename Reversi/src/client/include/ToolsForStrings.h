@@ -10,6 +10,7 @@
 #include <string>
 #include <utility>
 #include <sstream>
+#include <vector>
 
 char *myToString(int number);
 
@@ -18,5 +19,7 @@ bool replaceStringWithString(std::string& replacee,
 							 const std::string& replaceWith);
 
 std::pair<int, int> extractPairFromString(std::string& theString);
+
+std::vector<std::string> splitString(std::string& toSplit, char splitter);
 
 #endif /* TOOLSFORSTRINGS_H_ */

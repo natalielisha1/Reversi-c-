@@ -20,8 +20,6 @@
 #include <pthread.h>
 #include <unistd.h>
 
-//#define MAX_GAMES 5
-
 #define SEND_FLAGS 0
 
 //Predefined error results
@@ -66,7 +64,6 @@ public:
 
 	bool removeGame(GameInfo *currGame);
 private:
-	//GameInfo matches[5];
 	std::vector<GameInfo *>matches;
 	std::map<int, GameInfo *> matchClientMap;
 	GameSet::CommandOption lastCommand;
@@ -77,12 +74,11 @@ private:
 
 	bool sendMessageToClient(int client, std::string& msg);
 
-	//GameInfo *clientExists(int client);
-
 	//Regular messages
 	std::string firstPlayerMessage;
 	std::string secondPlayerMessage;
 	std::string endGameMessage;
+	std::string noGamesAvailableMessage;
 
 	//Error messages
 	std::string noErrorMessage;

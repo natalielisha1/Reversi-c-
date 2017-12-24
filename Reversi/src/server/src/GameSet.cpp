@@ -14,6 +14,7 @@ GameSet::GameSet(): lastCommand(GameSet::Debug), lastCommandResult(-1) {
 	firstPlayerMessage = string("1");
 	secondPlayerMessage = string("2");
 	endGameMessage = string("END");
+	noGamesAvailableMessage = string("NONE");
 
 	//Error messages init
 	noErrorMessage = string("OK");
@@ -161,6 +162,7 @@ void GameSet::joinMatch(int clientBSocket, vector<string> args) {
 				(*it)->setClientB(clientBSocket);
 				(*it)->setStatus(GameInfo::Playing);
 				pthread_mutex_lock(&stringsMutex);
+				sendMessageToClient(clientBSocket, noErrorMessage);
 				sendMessageToClient(clientASocket, firstPlayerMessage);
 				sendMessageToClient(clientBSocket, secondPlayerMessage);
 				pthread_mutex_unlock(&stringsMutex);
@@ -265,6 +267,9 @@ void GameSet::listMatches(int senderClient) {
 		}
 	}
 	pthread_mutex_unlock(&matchesMutex);
+	if (toSend == "") {
+		toSend = noGamesAvailableMessage;
+	}
 	sendMessageToClient(senderClient, toSend);
 	lastCommandResult = NO_ERROR_RESULT;
 }

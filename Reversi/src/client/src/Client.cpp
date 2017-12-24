@@ -14,7 +14,7 @@ using namespace std;
  * The Function Operation: initializing
  *  the client from config file
  **************************************/
-Client::Client(): clientSocket(0) {
+Client::Client(): clientSocket(0), gameName("") {
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_address.txt");
 	serverConfig >> serverIP;
@@ -31,7 +31,7 @@ Client::Client(): clientSocket(0) {
  * The Function Operation: initializing
  *  the client
  **************************************/
-Client::Client(string &serverIP, int serverPort): serverIP(serverIP), serverPort(serverPort), clientSocket(0) {
+Client::Client(string &serverIP, int serverPort): serverIP(serverIP), serverPort(serverPort), clientSocket(0), gameName("") {
 	//Nothing right now
 
 }
@@ -113,7 +113,7 @@ string Client::readMessage() {
 	int readSize;
 	while (true) {
 		//Receiving the message
-		if ((readSize = recv(clientSocket, buffer, BUFFER_SIZE, RECV_FLAGS)) > 0) {
+		if ((readSize = recv(clientSocket, buffer, BUFFER_SIZE - 1, RECV_FLAGS)) > 0) {
 			//Adding the buffer to the string
 			toReturn.append(buffer);
 		}
@@ -121,8 +121,27 @@ string Client::readMessage() {
 			//If the message is over, return it
 			return toReturn;
 		}
+		for (int i = 0; i < BUFFER_SIZE; i++) {
+			buffer[i] = '\0';
+		}
 	}
 }
+
+string Client::readShortMessage() {
+	//Preparing the string to return
+	string toReturn = string("");
+	//Creating a buffer
+	char buffer[SHORT_BUFFER_SIZE] = {0};
+	//Creating a var to keep the socket response
+	int readSize;
+	//Receiving the message
+	if ((readSize = recv(clientSocket, buffer, SHORT_BUFFER_SIZE - 1, RECV_FLAGS)) > 0) {
+		//Adding the buffer to the string
+		toReturn.append(buffer);
+	}
+	return toReturn;
+}
+
 
 /***************************************
  * Function Name: waitForCue (Experimental)
@@ -164,12 +183,12 @@ int Client::getOrder() {
 	string first = string("1");
 	string second = string("2");
 	//Creating a buffer
-	char buffer[BUFFER_SIZE] = {0};
+	char buffer[REALLY_SHORT_BUFFER_SIZE] = {0};
 	//Creating a var to keep the socket response
 	int readSize;
 	while (true) {
 		//Receiving the message
-		if ((readSize = recv(clientSocket, buffer, BUFFER_SIZE, RECV_FLAGS)) > 0) {
+		if ((readSize = recv(clientSocket, buffer, REALLY_SHORT_BUFFER_SIZE - 1, RECV_FLAGS)) > 0) {
 			//Comparing the strings to the buffer
 			if (strcmp(first.c_str(), buffer) == 0) {
 				return 1;
@@ -179,4 +198,48 @@ int Client::getOrder() {
 		}
 	}
 	return -1;
+}
+
+string Client::genUniqueGameIdentifier() {
+	string gameID = "OS";
+
+	char *toStringResult;
+
+	time_t now = time(0);
+
+	tm *ltm = localtime(&now);
+
+	toStringResult = myToString(ltm->tm_hour);
+	if (strlen(toStringResult) == 1) {
+		gameID.append("0");
+	}
+	gameID.append(toStringResult);
+	delete[] toStringResult;
+
+	toStringResult = myToString(ltm->tm_min);
+	if (strlen(toStringResult) == 1) {
+		gameID.append("0");
+	}
+	gameID.append(toStringResult);
+	delete[] toStringResult;
+
+	toStringResult = myToString(ltm->tm_sec);
+	if (strlen(toStringResult) == 1) {
+		gameID.append("0");
+	}
+	gameID.append(toStringResult);
+	delete[] toStringResult;
+
+	gameID.append("NE");
+
+	gameName = gameID;
+	return gameID;
+}
+
+const std::string& Client::getGameName() const {
+	return gameName;
+}
+
+void Client::setGameName(const std::string& gameName) {
+	this->gameName = gameName;
 }

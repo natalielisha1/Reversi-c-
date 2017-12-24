@@ -34,8 +34,6 @@ public:
 
 	int getOtherClient(int firstClient);
 
-	//pthread_mutex_t getStatusMutex() const;
-
 	bool getInterrupt();
 	void setInterrupt(bool interrupt);
 

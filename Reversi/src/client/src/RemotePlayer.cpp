@@ -15,10 +15,69 @@ using namespace std;
  *  client, and getting the player's order
  **************************************/
 RemotePlayer::RemotePlayer(Board::Cell type): Player(type), client() {
+	cout << "Connecting to the server" << endl;
 	//Connecting to the server
 	client.connectToServer();
-	//Waiting for the other player
-	cout << "Waiting for other player to join..." << endl;
+
+	int option = 0;
+	string msgToSend;
+	string gameID;
+	string result;
+	do {
+		cout << "Choose your option:" << endl;
+		cout << "1. Start a new game" << endl;
+		cout << "2. Join an existing game" << endl;
+		cin >> option;
+
+		switch (option) {
+			case 1: {
+				result = "";
+				gameID = "";
+				while (result != "OK") {
+					gameID = client.genUniqueGameIdentifier();
+					msgToSend = "start ";
+					msgToSend.append(gameID);
+					client.sendMessage(msgToSend.c_str());
+					result = client.readShortMessage();
+				}
+				cout << "Your game ID is " << gameID << endl;
+				cout << "Waiting for a player to join the game..." << endl;
+				break;
+			}
+			case 2: {
+				msgToSend = "list_games";
+				client.sendMessage(msgToSend.c_str());
+				result = client.readMessage();
+				if (result == "NONE") {
+					cout << "There are no available games to join." << endl;
+					option = 0;
+				} else {
+					vector<string> availableGames = splitString(result, ',');
+					cout << "Available games: (enter the game index)" << endl;
+					int gameIndex = 0;
+					for (vector<string>::iterator it = availableGames.begin(); it != availableGames.end(); ++it) {
+						cout << gameIndex << ". " << *it << endl;
+						gameIndex++;
+					}
+					int chosenGame = 0;
+					cin >> chosenGame;
+
+					gameID = availableGames.at(chosenGame);
+					msgToSend = "join ";
+					msgToSend.append(gameID);
+					client.sendMessage(msgToSend.c_str());
+					result = client.readShortMessage();
+					if (result == "OK") {
+						client.setGameName(gameID);
+					} else {
+						cout << "Joining the game failed." << endl;
+						option = 0;
+					}
+				}
+			}
+		}
+
+	} while (option != 1 && option != 2);
 	//Getting the order
 	int order = client.getOrder();
 	if (order == 1) {
@@ -51,12 +110,19 @@ Point RemotePlayer::makeMove(vector<Point>* options, Point bestMove) {
 	//Waiting for the move
 	cout << "Waiting for other player's move..." << endl;
 
-	//Creating a string to compare to
+	//Creating strings to compare to
 	string noMove = "NoMove";
+	string end = "END";
+
 	//Getting the message
 	string moveMsg = client.readMessage();
+
+	//Doing the comparisons
 	if (moveMsg == noMove) {
 		return Point(-1,-1);
+	}
+	if (moveMsg == end) {
+		return Point(-2,-2);
 	}
 	//Returning the move from the message
 	Point theMove = Point(extractPairFromString(moveMsg));
@@ -80,7 +146,7 @@ void RemotePlayer::sendMessage(const char* message) {
 	string openBrackets = "(";
 	string closingBrackets = ")";
 	string commaNoSpace = ",";
-	string commaWithSpace = ", ";
+	string space = " ";
 
 	string xWon = "X player won!";
 	string oWon = "O player won!";
@@ -94,6 +160,8 @@ void RemotePlayer::sendMessage(const char* message) {
 	string xPlayed = "X played ";
 	string oPlayed = "O played ";
 
+	string gameEnded = "Game Ended!";
+
 	//Creating vars to know if the message shouldn't be sent
 	static bool boardPrinting = false;
 	static int noMoveCounter = 0;
@@ -102,15 +170,25 @@ void RemotePlayer::sendMessage(const char* message) {
 
 	//Checking the message, and reacting accordingly
 	if (msgStr == xWon) {
-		client.sendMessage("END");
+		string temp = "close ";
+		temp.append(client.getGameName());
+		client.sendMessage(temp.c_str());
 		return;
 	}
 	if (msgStr == oWon) {
-		client.sendMessage("END");
+		string temp = "close ";
+		temp.append(client.getGameName());
+		client.sendMessage(temp.c_str());
 		return;
 	}
 	if (msgStr == tie) {
-		client.sendMessage("END");
+		string temp = "close ";
+		temp.append(client.getGameName());
+		client.sendMessage(temp.c_str());
+		return;
+	}
+	if (msgStr == gameEnded) {
+		//Do nothing - it shouldn't have happened
 		return;
 	}
 
@@ -123,11 +201,11 @@ void RemotePlayer::sendMessage(const char* message) {
 		if (boardPrinting) {
 			if (noMoveCounter == 0) {
 				if (this->type == Board::O) {
-					client.sendMessage("NoMove");
+					client.sendMessage("play NoMove");
 				}
 				noMoveCounter++;
 			} else {
-				client.sendMessage("NoMove");
+				client.sendMessage("play NoMove");
 				noMoveCounter++;
 			}
 		}
@@ -138,11 +216,11 @@ void RemotePlayer::sendMessage(const char* message) {
 		if (boardPrinting) {
 			if (noMoveCounter == 0) {
 				if (this->type == Board::O) {
-					client.sendMessage("NoMove");
+					client.sendMessage("play NoMove");
 				}
 				noMoveCounter++;
 			} else {
-				client.sendMessage("NoMove");
+				client.sendMessage("play NoMove");
 				noMoveCounter++;
 			}
 		}
@@ -152,14 +230,15 @@ void RemotePlayer::sendMessage(const char* message) {
 
 	//The board should be printed locally
 	if (boardPrinting) {
-		string temp = string(message);
+		string temp = "play ";
+		temp.append(msgStr);
 		//The move should be sent
 		if (temp.find(xPlayed) != string::npos) {
 			boardPrinting = false;
 			replaceStringWithString(temp, xPlayed, blank);
 			replaceStringWithString(temp, openBrackets, blank);
 			replaceStringWithString(temp, closingBrackets, blank);
-			replaceStringWithString(temp, commaNoSpace, commaWithSpace);
+			replaceStringWithString(temp, commaNoSpace, space);
 			client.sendMessage(temp.c_str());
 			return;
 		} else if (temp.find(oPlayed) != string::npos) {
@@ -167,7 +246,7 @@ void RemotePlayer::sendMessage(const char* message) {
 			replaceStringWithString(temp, oPlayed, blank);
 			replaceStringWithString(temp, openBrackets, blank);
 			replaceStringWithString(temp, closingBrackets, blank);
-			replaceStringWithString(temp, commaNoSpace, commaWithSpace);
+			replaceStringWithString(temp, commaNoSpace, space);
 			client.sendMessage(temp.c_str());
 			return;
 		} else {

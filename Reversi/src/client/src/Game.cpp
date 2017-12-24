@@ -144,6 +144,11 @@ void Game::run() {
 		 * the options to place Cells
 		 */
 		vector<Point> *tempOptions;
+		if (move == Point(-2,-2)) {
+			xPlayer->sendMessage("Game Ended!");
+			currStatus = checkWinning();
+			break;
+		}
 		//Printing the board, and letting X play
 		xPlayer->sendMessage("Current board:");
 		xPlayer->sendMessage("");
@@ -166,6 +171,11 @@ void Game::run() {
 		//Letting him choose
 		move = xPlayer->makeMove(tempOptions, bestMove);
 		delete tempOptions;
+		if (move == Point(-2,-2)) {
+			oPlayer->sendMessage("Game Ended!");
+			currStatus = checkWinning();
+			break;
+		}
 		if (move == Point(-1,-1)) {
 			if (toCheckOther) {
 				currStatus = checkWinning();

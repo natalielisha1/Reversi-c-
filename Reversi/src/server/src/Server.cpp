@@ -15,8 +15,9 @@ using namespace std;
  *  the server from config file
  **************************************/
 Server::Server(): serverSocket(0),
-				  	  	  	  cmdManager(games),
-				  	  	  	  verbose(false) {
+				  cmdManager(games),
+				  lastUsedGame(NULL),
+				  verbose(false) {
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
 	if (!serverConfig.is_open()) {
@@ -38,8 +39,9 @@ Server::Server(): serverSocket(0),
  *  the server from config file
  **************************************/
 Server::Server(bool verbose): serverSocket(0),
-							  	  	  	  	  	  	  cmdManager(games),
-							  	  	  	  	  	  	  	verbose(verbose) {
+							  cmdManager(games),
+							  lastUsedGame(NULL),
+							  verbose(verbose) {
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
 	if (!serverConfig.is_open()) {
@@ -61,8 +63,9 @@ Server::Server(bool verbose): serverSocket(0),
  *  the server from port input
  **************************************/
 Server::Server(int port): port(port), serverSocket(0),
-						  	  	  	  	  	  cmdManager(games),
-						  	  	  	  	  	  verbose(false){
+						  cmdManager(games),
+						  lastUsedGame(NULL),
+						  verbose(false){
 	pthread_mutex_init(&gamesMutex, NULL);
 	pthread_mutex_init(&verboseMutex, NULL);
 }
@@ -75,8 +78,9 @@ Server::Server(int port): port(port), serverSocket(0),
  *  the server from port input
  **************************************/
 Server::Server(int port, bool verbose): port(port), serverSocket(0),
-																		 cmdManager(games),
-																		 verbose(verbose){
+										cmdManager(games),
+										lastUsedGame(NULL),
+										verbose(verbose){
 	pthread_mutex_init(&gamesMutex, NULL);
 	pthread_mutex_init(&verboseMutex, NULL);
 }
@@ -138,6 +142,7 @@ void Server::start() {
 			cout << "Error on accept" << endl;
 			continue;
 		}
+		cout << "New Client is connected" << endl;
 
 		//Handling the requests
 		bool ok = true;
@@ -275,10 +280,6 @@ void Server::addThread(int client) {
 
 	GameInfo *currGame = games.getGameInfo(client);
 
-//	pair<GameInfo *, Server *> arg;
-//
-//	arg = make_pair(currGame, this);
-
 	lastUsedGame = currGame;
 
 	int threadCreateResult = pthread_create(newThread, NULL, gameThreadMain, (void *) this);
@@ -303,11 +304,6 @@ bool Server::getVerbose() {
 
 //Outsider Functions
 void *gameThreadMain(void *arg) {
-//	pair<GameInfo *, Server *> fromArg;
-//	fromArg = *(pair<GameInfo *, Server *> *) arg;
-//
-//	GameInfo *currGame = fromArg.first;
-
 	Server *theServer = (Server *) arg;
 	GameInfo *currGame = theServer->lastUsedGame;
 

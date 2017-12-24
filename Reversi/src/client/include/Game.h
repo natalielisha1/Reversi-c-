@@ -27,7 +27,7 @@
 
 class Game {
 public:
-	enum GameStatus { NotPlaying, InProgress, XWins, OWins, Tie };
+	enum GameStatus { NotPlaying, InProgress, XWins, OWins, Tie, Finished };
 
 	Game();
 	Game(char xPlayerIdentifier, char oPlayerIdentifier);
