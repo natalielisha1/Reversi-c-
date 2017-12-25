@@ -17,6 +17,8 @@ using namespace std;
 Server::Server(): serverSocket(0),
 				  cmdManager(games),
 				  lastUsedGame(NULL),
+				  lastUsedClient(-1),
+				  serverExit(false),
 				  verbose(false) {
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
@@ -29,6 +31,9 @@ Server::Server(): serverSocket(0),
 	serverConfig.close();
 	pthread_mutex_init(&gamesMutex, NULL);
 	pthread_mutex_init(&verboseMutex, NULL);
+	pthread_mutex_init(&lastGameMutex, NULL);
+	pthread_mutex_init(&lastClientMutex, NULL);
+	pthread_mutex_init(&coutMutex, NULL);
 }
 
 /***************************************
@@ -41,6 +46,8 @@ Server::Server(): serverSocket(0),
 Server::Server(bool verbose): serverSocket(0),
 							  cmdManager(games),
 							  lastUsedGame(NULL),
+							  lastUsedClient(-1),
+							  serverExit(false),
 							  verbose(verbose) {
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
@@ -53,6 +60,9 @@ Server::Server(bool verbose): serverSocket(0),
 	serverConfig.close();
 	pthread_mutex_init(&gamesMutex, NULL);
 	pthread_mutex_init(&verboseMutex, NULL);
+	pthread_mutex_init(&lastGameMutex, NULL);
+	pthread_mutex_init(&lastClientMutex, NULL);
+	pthread_mutex_init(&coutMutex, NULL);
 }
 
 /***************************************
@@ -65,9 +75,14 @@ Server::Server(bool verbose): serverSocket(0),
 Server::Server(int port): port(port), serverSocket(0),
 						  cmdManager(games),
 						  lastUsedGame(NULL),
+						  lastUsedClient(-1),
+						  serverExit(false),
 						  verbose(false){
 	pthread_mutex_init(&gamesMutex, NULL);
 	pthread_mutex_init(&verboseMutex, NULL);
+	pthread_mutex_init(&lastGameMutex, NULL);
+	pthread_mutex_init(&lastClientMutex, NULL);
+	pthread_mutex_init(&coutMutex, NULL);
 }
 
 /***************************************
@@ -80,9 +95,14 @@ Server::Server(int port): port(port), serverSocket(0),
 Server::Server(int port, bool verbose): port(port), serverSocket(0),
 										cmdManager(games),
 										lastUsedGame(NULL),
+										lastUsedClient(-1),
+										serverExit(false),
 										verbose(verbose){
 	pthread_mutex_init(&gamesMutex, NULL);
 	pthread_mutex_init(&verboseMutex, NULL);
+	pthread_mutex_init(&lastGameMutex, NULL);
+	pthread_mutex_init(&lastClientMutex, NULL);
+	pthread_mutex_init(&coutMutex, NULL);
 }
 
 /***************************************
@@ -93,6 +113,10 @@ Server::Server(int port, bool verbose): port(port), serverSocket(0),
  **************************************/
 Server::~Server() {
 	for (vector<pthread_t *>::iterator it = gameThreads.begin(); it != gameThreads.end(); ++it) {
+		delete (*it);
+	}
+
+	for (vector<pthread_t *>::iterator it = clientCommunicationThreads.begin(); it != clientCommunicationThreads.end(); ++it) {
 		delete (*it);
 	}
 }
@@ -106,6 +130,8 @@ Server::~Server() {
  *  server
  **************************************/
 void Server::start() {
+	pthread_t exitThread;
+
 	//Creating a socket pointer
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (serverSocket == -1) {
@@ -125,10 +151,23 @@ void Server::start() {
 	//Starting listening to incoming connections
 	listen(serverSocket, MAX_CONNECTED_CLIENTS);
 
+	int exitThreadResult = pthread_create(&exitThread, NULL, exitThreadMain, (void *) this);
+	if (exitThreadResult) {
+		cout << "Exit thread creation failed, exiting" << endl;
+		return;
+	} else {
+		cout << "Enter 'exit' to close the server" << endl;
+	}
+
 	//Waiting for the clients to connect
+	pthread_mutex_lock(&coutMutex);
 	cout << "Waiting for client connections..." << endl;
+	pthread_mutex_unlock(&coutMutex);
 
 	while (true) {
+		if (getExit()) {
+			break;
+		}
 		int currClientSocket;
 		struct sockaddr_in currClient;
 		socklen_t clientLen = sizeof(struct sockaddr_in);
@@ -139,25 +178,50 @@ void Server::start() {
 		currClientSocket = accept(serverSocket, (struct sockaddr *)&currClient, (socklen_t*)&clientLen);
 		if (currClientSocket == -1) {
 			//The first client's connection failed, so we crash
+			pthread_mutex_lock(&coutMutex);
 			cout << "Error on accept" << endl;
+			pthread_mutex_unlock(&coutMutex);
 			continue;
 		}
+		if (getExit()) {
+			close(currClientSocket);
+			break;
+		}
+		pthread_mutex_lock(&coutMutex);
 		cout << "New Client is connected" << endl;
+		pthread_mutex_unlock(&coutMutex);
 
-		//Handling the requests
-		bool ok = true;
-		while (ok) {
-			ok = handleCommand(currClientSocket);
-			if (!ok || (games.getLastCommand() == GameSet::Start &&
-								 games.getLastCommandResult() == NO_ERROR_RESULT)) {
-				ok = false;
-			} else if (games.getLastCommand() == GameSet::Join &&
-								games.getLastCommandResult() == NO_ERROR_RESULT) {
-				addThread(currClientSocket);
-				ok = false;
-			}
+		pthread_t *newThread = new pthread_t();
+
+		clientCommunicationThreads.push_back(newThread);
+
+		lastUsedClient = currClientSocket;
+
+		int threadCreateResult = pthread_create(newThread, NULL, clientCommunicationThreadMain, (void *) this);
+
+		if (threadCreateResult) {
+			pthread_mutex_lock(&coutMutex);
+			cout << "Error, thread creating failed" << endl;
+			pthread_mutex_unlock(&coutMutex);
+
+			removeFromVector(&clientCommunicationThreads, newThread);
 		}
 	}
+	pthread_mutex_lock(&coutMutex);
+	cout << "Closing all communications, please wait." << endl;
+	pthread_mutex_unlock(&coutMutex);
+
+	for (vector<pthread_t *>::iterator it = clientCommunicationThreads.begin(); it != clientCommunicationThreads.end(); ++it) {
+		pthread_join(*(*it), NULL);
+	}
+
+	for (vector<pthread_t *>::iterator it = gameThreads.begin(); it != gameThreads.end(); ++it) {
+		pthread_join(*(*it), NULL);
+	}
+
+	pthread_mutex_lock(&coutMutex);
+	cout << "All done. All communications are closed!" << endl;
+	pthread_mutex_unlock(&coutMutex);
 }
 
 /***************************************
@@ -240,11 +304,15 @@ bool Server::handleCommand(int client) {
 		readSize = recv(client, buffer, BUFFER_SIZE, RECV_FLAGS);
 		if (readSize == -1) {
 			//Error in receiving
+			pthread_mutex_lock(&coutMutex);
 			cout << "Error reading from client " << client << endl;
+			pthread_mutex_unlock(&coutMutex);
 			return false;
 		} else if (readSize == 0) {
-			//Client disconnection
+			//Client disconnected
+			pthread_mutex_lock(&coutMutex);
 			cout << "Client " << client << " disconnected" << endl;
+			pthread_mutex_unlock(&coutMutex);
 			return false;
 		}
 
@@ -255,7 +323,9 @@ bool Server::handleCommand(int client) {
 		}
 	}
 	if (getVerbose()) {
+		pthread_mutex_lock(&coutMutex);
 		cout << msg << endl;
+		pthread_mutex_unlock(&coutMutex);
 	}
 	pair<string, vector<string> > cmd = extractCommand(msg);
 	cmdManager.executeCommand(client, cmd.first, cmd.second);
@@ -267,7 +337,9 @@ bool Server::sendMessageToClient(int client, string& msg) {
 	writeSize = send(client, msg.c_str(), msg.length(), SEND_FLAGS);
 	if (writeSize == -1) {
 		//Error in writing
-		cout << "Error writing to client" << endl;
+		pthread_mutex_lock(&coutMutex);
+		cout << "Error writing to client " << client << endl;
+		pthread_mutex_unlock(&coutMutex);
 		return false;
 	}
 	return true;
@@ -285,7 +357,9 @@ void Server::addThread(int client) {
 	int threadCreateResult = pthread_create(newThread, NULL, gameThreadMain, (void *) this);
 
 	if (threadCreateResult) {
+		pthread_mutex_lock(&coutMutex);
 		cout << "Error, thread creating failed" << endl;
+		pthread_mutex_unlock(&coutMutex);
 
 		removeFromVector(&gameThreads, newThread);
 		int other = currGame->getOtherClient(client);
@@ -302,7 +376,50 @@ bool Server::getVerbose() {
 	return toReturn;
 }
 
+bool Server::getExit() {
+	pthread_mutex_lock(&serverExitMutex);
+	bool toReturn = serverExit;
+	pthread_mutex_unlock(&serverExitMutex);
+	return toReturn;
+}
+
+
+void Server::setExit(bool exit) {
+	pthread_mutex_lock(&serverExitMutex);
+	serverExit = exit;
+	pthread_mutex_unlock(&serverExitMutex);
+	if (exit) {
+		games.interruptMatches();
+	}
+}
+
 //Outsider Functions
+pair<string, vector<string> > extractCommand(string& msg) {
+	string command;
+	vector<string> args;
+	string currentWord = "";
+	bool foundCommand = false;
+
+	if (msg.find(" ") == string::npos) {
+		return make_pair(msg, args);
+	}
+
+	size_t index = 0;
+	while ((index = msg.find(" ")) != string::npos) {
+		currentWord = msg.substr(0, index);
+		if (!foundCommand) {
+			command = currentWord;
+			foundCommand = true;
+		} else {
+			args.push_back(currentWord);
+		}
+		msg = msg.substr(index + 1);
+	}
+	args.push_back(msg);
+
+	return make_pair(command, args);
+}
+
 void *gameThreadMain(void *arg) {
 	Server *theServer = (Server *) arg;
 	GameInfo *currGame = theServer->lastUsedGame;
@@ -330,28 +447,44 @@ void *gameThreadMain(void *arg) {
 	return NULL;
 }
 
-pair<string, vector<string> > extractCommand(string& msg) {
-	string command;
-	vector<string> args;
-	string currentWord = "";
-	bool foundCommand = false;
+void* clientCommunicationThreadMain(void* arg) {
+	Server *theServer = (Server *) arg;
+	int currClientSocket = theServer->lastUsedClient;
 
-	if (msg.find(" ") == string::npos) {
-		return make_pair(msg, args);
-	}
-
-	size_t index = 0;
-	while ((index = msg.find(" ")) != string::npos) {
-		currentWord = msg.substr(0, index);
-		if (!foundCommand) {
-			command = currentWord;
-			foundCommand = true;
-		} else {
-			args.push_back(currentWord);
+	//Handling the requests
+	bool ok = true;
+	while (ok) {
+		if (theServer->getExit()) {
+			close(currClientSocket);
+			return NULL;
 		}
-		msg = msg.substr(index + 1);
+		ok = theServer->handleCommand(currClientSocket);
+		if (!ok || (theServer->games.getLastCommand() == GameSet::Start &&
+					theServer->games.getLastCommandResult() == NO_ERROR_RESULT)) {
+			ok = false;
+		} else if (theServer->games.getLastCommand() == GameSet::Join &&
+				   theServer->games.getLastCommandResult() == NO_ERROR_RESULT) {
+			theServer->addThread(currClientSocket);
+			ok = false;
+		} else if (theServer->getExit()) {
+			ok = false;
+			close(currClientSocket);
+		}
 	}
-	args.push_back(msg);
 
-	return make_pair(command, args);
+	return NULL;
+}
+
+void* exitThreadMain(void* arg) {
+	Server *theServer = (Server *) arg;
+
+	string input = "";
+	string toCompare = "exit";
+	cin >> input;
+	while (input != toCompare) {
+		cin >> input;
+	}
+	theServer->setExit(true);
+
+	return NULL;
 }
