@@ -33,7 +33,7 @@
 #define RECV_FLAGS 0
 #define SEND_FLAGS 0
 
-#define MAX_GAMES 5
+#define SOCKET_TIMEOUT 30
 
 class Server {
 public:

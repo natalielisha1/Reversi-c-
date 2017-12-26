@@ -117,13 +117,19 @@ string Client::readMessage() {
 			//Adding the buffer to the string
 			toReturn.append(buffer);
 		}
+		//We had some kind of error, so we return what we had so far
+		if (readSize <= 0) {
+			if (toReturn == "") {
+				return "NULL";
+			} else {
+				return toReturn;
+			}
+		}
 		if (readSize != BUFFER_SIZE) {
 			//If the message is over, return it
 			return toReturn;
 		}
-		for (int i = 0; i < BUFFER_SIZE; i++) {
-			buffer[i] = '\0';
-		}
+		memset(buffer, 0, BUFFER_SIZE);
 	}
 }
 
@@ -138,6 +144,8 @@ string Client::readShortMessage() {
 	if ((readSize = recv(clientSocket, buffer, SHORT_BUFFER_SIZE - 1, RECV_FLAGS)) > 0) {
 		//Adding the buffer to the string
 		toReturn.append(buffer);
+	} else {
+		return "NULL";
 	}
 	return toReturn;
 }
@@ -195,6 +203,8 @@ int Client::getOrder() {
 			} else if (strcmp(second.c_str(), buffer) == 0) {
 				return 2;
 			}
+		} else {
+			return -1;
 		}
 	}
 	return -1;

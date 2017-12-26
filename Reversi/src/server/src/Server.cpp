@@ -148,6 +148,16 @@ void Server::start() {
 		//The binding failed, so we crash
 		throw "Error on binding";
 	}
+	//Setting a timeout - to be able to shutdown gracefully (almost) anytime
+	struct timeval tv;
+	tv.tv_sec = SOCKET_TIMEOUT;
+	tv.tv_usec = 0;
+
+	if (setsockopt(serverSocket, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&tv, sizeof(struct timeval)) < 0) {
+		//Timeout setting failed, so we crash
+		throw "Error on setting timeout";
+	}
+
 	//Starting listening to incoming connections
 	listen(serverSocket, MAX_CONNECTED_CLIENTS);
 
@@ -176,12 +186,25 @@ void Server::start() {
 
 		//Connecting the current client
 		currClientSocket = accept(serverSocket, (struct sockaddr *)&currClient, (socklen_t*)&clientLen);
-		if (currClientSocket == -1) {
-			//The first client's connection failed, so we crash
-			pthread_mutex_lock(&coutMutex);
-			cout << "Error on accept" << endl;
-			pthread_mutex_unlock(&coutMutex);
-			continue;
+
+		bool exitNow = false;
+		while (currClientSocket < 0 && !exitNow) {
+			//Timeout (or failure), so we check for exit and get beck to accepting
+			if (getExit()) {
+				exitNow = true;
+				break;
+			}
+			if (getVerbose()) {
+				pthread_mutex_lock(&coutMutex);
+				cout << "Client accept timeout, retrying.." << endl;
+				pthread_mutex_unlock(&coutMutex);
+			}
+			//Cleaning and retrying the accept
+			bzero((void *)&currClient, sizeof(currClient));
+			currClientSocket = accept(serverSocket, (struct sockaddr *)&currClient, (socklen_t*)&clientLen);
+		}
+		if (exitNow) {
+			break;
 		}
 		if (getExit()) {
 			close(currClientSocket);
@@ -207,9 +230,6 @@ void Server::start() {
 			removeFromVector(&clientCommunicationThreads, newThread);
 		}
 	}
-	pthread_mutex_lock(&coutMutex);
-	cout << "Closing all communications, please wait." << endl;
-	pthread_mutex_unlock(&coutMutex);
 
 	for (vector<pthread_t *>::iterator it = clientCommunicationThreads.begin(); it != clientCommunicationThreads.end(); ++it) {
 		pthread_join(*(*it), NULL);
@@ -258,11 +278,11 @@ bool Server::handleClient(int sender, char curr, int reciever) {
 	while (true) {
 		//Reading the message
 		readSize = recv(sender, buffer, BUFFER_SIZE, RECV_FLAGS);
-		if (readSize == -1) {
-			//Error in receiving
-			cout << "Error reading from client " << curr << endl;
-			return false;
-		} else if (readSize == 0) {
+		while (readSize == -1) {
+			//Re-reading the message (timeout)
+			readSize = recv(sender, buffer, BUFFER_SIZE, RECV_FLAGS);
+		}
+		if (readSize == 0) {
 			//Client disconnection
 			cout << "Client " << curr << " disconnected" << endl;
 			return false;
@@ -276,11 +296,11 @@ bool Server::handleClient(int sender, char curr, int reciever) {
 
 		//Writing the message to the other client
 		writeSize = send(reciever, buffer, strlen(buffer), SEND_FLAGS);
-		if (writeSize == -1) {
-			//Error in writing
-			cout << endl << "Error writing to client " << curr << endl;
-			return false;
+		while (writeSize == -1) {
+			//Re-writing the message (timeout)
+			writeSize = send(reciever, buffer, strlen(buffer), SEND_FLAGS);
 		}
+
 		if (writeSize != BUFFER_SIZE) {
 			//The message received completely
 			if (getVerbose()) {
@@ -302,13 +322,11 @@ bool Server::handleCommand(int client) {
 	while (true) {
 		//Reading the message
 		readSize = recv(client, buffer, BUFFER_SIZE, RECV_FLAGS);
-		if (readSize == -1) {
-			//Error in receiving
-			pthread_mutex_lock(&coutMutex);
-			cout << "Error reading from client " << client << endl;
-			pthread_mutex_unlock(&coutMutex);
-			return false;
-		} else if (readSize == 0) {
+		while (readSize == -1) {
+			//Re-reading the message (timeout)
+			readSize = recv(client, buffer, BUFFER_SIZE, RECV_FLAGS);
+		}
+		if (readSize <= 0) {
 			//Client disconnected
 			pthread_mutex_lock(&coutMutex);
 			cout << "Client " << client << " disconnected" << endl;
@@ -317,6 +335,7 @@ bool Server::handleCommand(int client) {
 		}
 
 		msg.append(buffer);
+		memset(buffer, 0, BUFFER_SIZE);
 
 		if (readSize != BUFFER_SIZE) {
 			break;
@@ -324,7 +343,7 @@ bool Server::handleCommand(int client) {
 	}
 	if (getVerbose()) {
 		pthread_mutex_lock(&coutMutex);
-		cout << msg << endl;
+		cout << client << ": " << msg << endl;
 		pthread_mutex_unlock(&coutMutex);
 	}
 	pair<string, vector<string> > cmd = extractCommand(msg);
@@ -335,7 +354,7 @@ bool Server::handleCommand(int client) {
 bool Server::sendMessageToClient(int client, string& msg) {
 	int writeSize;
 	writeSize = send(client, msg.c_str(), msg.length(), SEND_FLAGS);
-	if (writeSize == -1) {
+	if (writeSize < 0) {
 		//Error in writing
 		pthread_mutex_lock(&coutMutex);
 		cout << "Error writing to client " << client << endl;
@@ -485,6 +504,10 @@ void* exitThreadMain(void* arg) {
 		cin >> input;
 	}
 	theServer->setExit(true);
+	pthread_mutex_lock(&theServer->coutMutex);
+	cout << "Closing all communications, please wait." << endl;
+	cout << "It may take up to 30 seconds" << endl;
+	pthread_mutex_unlock(&theServer->coutMutex);
 
 	return NULL;
 }
