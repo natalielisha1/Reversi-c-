@@ -9,6 +9,14 @@
 
 using namespace std;
 
+/***************************************
+ * Function Name: GameSet
+ * The Input: last command and last
+ * 					  command result
+ * The Output: a GameSet instance
+ * The Function Operation: initializing
+ * the game set
+ **************************************/
 GameSet::GameSet(): lastCommand(GameSet::Debug), lastCommandResult(-1) {
 	//Regular messages init
 	firstPlayerMessage = string("1");
@@ -30,12 +38,28 @@ GameSet::GameSet(): lastCommand(GameSet::Debug), lastCommandResult(-1) {
 	pthread_mutex_init(&stringsMutex, NULL);
 }
 
+/***************************************
+ * Function Name: ~GameSet (Destructor)
+ * The Input: no input
+ * The Output: no output
+ * The Function Operation: deletes every
+ * element in the game information vector
+ **************************************/
 GameSet::~GameSet() {
 	for (vector<GameInfo *>::iterator it = matches.begin(); it != matches.end(); ++it) {
 		delete *it;
 	}
 }
 
+/***************************************
+ * Function Name: debugMessage
+ * The Input: integer that represents the
+ * client socket and a vector of strings that
+ * contains the arguments
+ * The Output: no output
+ * The Function Operation: debugging the message
+ * in case there are errors
+ **************************************/
 void GameSet::debugMessage(int clientSocket, vector<string> args) {
 	string toSend = "";
 	char *toStringResult;
@@ -92,6 +116,14 @@ void GameSet::debugMessage(int clientSocket, vector<string> args) {
 	lastCommandResult = ERROR_NO_ARGS_RESULT;
 }
 
+/***************************************
+ * Function Name: startNewMatch
+ * The Input: integer that represents client
+ * A's socket and a vector of strings that
+ * represents the arguments
+ * The Output: no output
+ * The Function Operation: starting a new match
+ **************************************/
 void GameSet::startNewMatch(int clientASocket, vector<string> args) {
 	lastCommand = GameSet::Start;
 
@@ -138,6 +170,15 @@ void GameSet::startNewMatch(int clientASocket, vector<string> args) {
 	pthread_mutex_unlock(&stringsMutex);
 }
 
+/***************************************
+ * Function Name: joinMatch
+ * The Input: a socket id of the second client
+ * (the client who wants to join) and vector of
+ * arguments
+ * The Output: no output
+ * The Function Operation: adding a new client
+ * to the match
+ **************************************/
 void GameSet::joinMatch(int clientBSocket, vector<string> args) {
 	lastCommand = GameSet::Join;
 
@@ -178,6 +219,16 @@ void GameSet::joinMatch(int clientBSocket, vector<string> args) {
 	pthread_mutex_unlock(&stringsMutex);
 }
 
+/***************************************
+ * Function Name: playMatch
+ * The Input: an id of the socket of the
+ * client, the x rate of the location of
+ * the move and the y rate of the same
+ * location
+ * The Output: no output
+ * The Function Operation: playing the match
+ * using the location of the intended move
+ **************************************/
 void GameSet::playMatch(int senderClient, string xLoc, string yLoc) {
 	lastCommand = GameSet::Play;
 
@@ -199,6 +250,16 @@ void GameSet::playMatch(int senderClient, string xLoc, string yLoc) {
 	lastCommandResult = NO_ERROR_RESULT;
 }
 
+/***************************************
+ * Function Name: playMatch
+ * The Input: the id socket of the sender client
+ * and a string of "no move"
+ * The Output: no output
+ * The Function Operation: "play the match"
+ * in case where there is no move- check
+ * if there's indeed no move and send an error
+ * and/or a message accordingly
+ **************************************/
 void GameSet::playMatch(int senderClient, string noMove) {
 	lastCommand = GameSet::Play;
 
@@ -221,6 +282,13 @@ void GameSet::playMatch(int senderClient, string noMove) {
 	}
 }
 
+/***************************************
+ * Function Name: closeMatch
+ * The Input: a socket id of the sender client
+ * and vector of arguments
+ * The Output: no output
+ * The Function Operation: closing the match
+ **************************************/
 void GameSet::closeMatch(int senderClient, vector<string> args) {
 	lastCommand = GameSet::Close;
 
@@ -254,6 +322,13 @@ void GameSet::closeMatch(int senderClient, vector<string> args) {
 	lastCommandResult = ERROR_GAME_DOES_NOT_EXIST_RESULT;
 }
 
+/***************************************
+ * Function Name: listMatches
+ * The Input: a socket id of the sender client
+ * The Output: no output
+ * The Function Operation: listing the names of
+ * the matches that played
+ **************************************/
 void GameSet::listMatches(int senderClient) {
 	lastCommand = GameSet::List;
 	string toSend = "";
@@ -274,6 +349,13 @@ void GameSet::listMatches(int senderClient) {
 	lastCommandResult = NO_ERROR_RESULT;
 }
 
+/***************************************
+ * Function Name: interruptMatches
+ * The Input: no input
+ * The Output: no output
+ * The Function Operation: interrupting
+ * each match in game
+ **************************************/
 void GameSet::interruptMatches() {
 	pthread_mutex_lock(&matchesMutex);
 	for (vector<GameInfo *>::iterator it = matches.begin(); it != matches.end(); ++it) {
@@ -282,6 +364,14 @@ void GameSet::interruptMatches() {
 	pthread_mutex_unlock(&matchesMutex);
 }
 
+/***************************************
+ * Function Name: removeGame
+ * The Input: the game information of the current
+ * game
+ * The Output: true if the removal has succeeded,
+ * otherwise false
+ * The Function Operation: removing the current game
+ **************************************/
 bool GameSet::removeGame(GameInfo *currGame) {
 	//GameInfo *currGame = getGameInfo(client);
 	if (currGame == NULL) {
@@ -316,6 +406,14 @@ bool GameSet::removeGame(GameInfo *currGame) {
 	}
 }
 
+/***************************************
+ * Function Name: sendMessageToClient
+ * The Input: the id of a client and a reference
+ * to the message that need to be sent to that client
+ * The Output: true if the process succeed,
+ * otherwise false
+ * The Function Operation:
+ **************************************/
 bool GameSet::sendMessageToClient(int client, string& msg) {
 	int writeSize;
 	writeSize = send(client, msg.c_str(), msg.length(), SEND_FLAGS);
@@ -327,14 +425,35 @@ bool GameSet::sendMessageToClient(int client, string& msg) {
 	return true;
 }
 
+/***************************************
+ * Function Name: getLastCommand
+ * The Input: no input
+ * The Output: command option
+ * The Function Operation: getting
+ * the last command in the current game
+ **************************************/
 GameSet::CommandOption GameSet::getLastCommand() const {
 	return lastCommand;
 }
 
+/***************************************
+ * Function Name: getLastCommandResult
+ * The Input: no input
+ * The Output: command result
+ * The Function Operation: getting
+ * the last command result in the current game
+ **************************************/
 int GameSet::getLastCommandResult() const {
 	return lastCommandResult;
 }
 
+/***************************************
+ * Function Name: getGameInfo
+ * The Input: id of a client's socket
+ * The Output: a pointer of a game information
+ * The Function Operation: returning the game
+ * information according to the given client
+ **************************************/
 GameInfo *GameSet::getGameInfo(int client) {
 	GameInfo *toReturn = NULL;
 	pthread_mutex_lock(&clientMapMutex);

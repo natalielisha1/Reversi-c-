@@ -133,6 +133,13 @@ string Client::readMessage() {
 	}
 }
 
+/***************************************
+ * Function Name: readShortMessage
+ * The Input: no input
+ * The Output: the short message
+ * The Function Operation: the function
+ * send a short lenghted message
+ **************************************/
 string Client::readShortMessage() {
 	//Preparing the string to return
 	string toReturn = string("");
@@ -210,6 +217,13 @@ int Client::getOrder() {
 	return -1;
 }
 
+/***************************************
+ * Function Name: genUniqueGameIndendifier
+ * The Input: no input
+ * The Output: identifier
+ * The Function Operation: the function
+ * generates the unique game identifier
+ **************************************/
 string Client::genUniqueGameIdentifier() {
 	string gameID = "OS";
 
@@ -246,10 +260,24 @@ string Client::genUniqueGameIdentifier() {
 	return gameID;
 }
 
+/***************************************
+ * Function Name: getGameName
+ * The Input: no input
+ * The Output: the name of the game
+ * The Function Operation: returns the name
+ * of the current game
+ **************************************/
 const std::string& Client::getGameName() const {
 	return gameName;
 }
 
+/***************************************
+ * Function Name: setGameName
+ * The Input: a new name for the game
+ * The Output: no output
+ * The Function Operation: changing the
+ * name of the game
+ **************************************/
 void Client::setGameName(const std::string& gameName) {
 	this->gameName = gameName;
 }

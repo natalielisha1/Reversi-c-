@@ -312,6 +312,13 @@ bool Server::handleClient(int sender, char curr, int reciever) {
 	return true;
 }
 
+/***************************************
+ * Function Name: handleCommand
+ * The Input: socket id of a client
+ * The Output: boolean value (true or false)
+ * The Function Operation: handling the client's
+ * command and returning if the operation succeeded
+ **************************************/
 bool Server::handleCommand(int client) {
 	//Creating a buffer
 	char buffer[BUFFER_SIZE] = {0};
@@ -351,6 +358,15 @@ bool Server::handleCommand(int client) {
 	return true;
 }
 
+/***************************************
+ * Function Name: sendMessageToClient
+ * The Input: socket id of a client and a reference
+ * to a message
+ * The Output: boolean value
+ * The Function Operation: sending a message
+ * to the given client and returning true if succeeded,
+ * otherwise false
+ **************************************/
 bool Server::sendMessageToClient(int client, string& msg) {
 	int writeSize;
 	writeSize = send(client, msg.c_str(), msg.length(), SEND_FLAGS);
@@ -364,6 +380,13 @@ bool Server::sendMessageToClient(int client, string& msg) {
 	return true;
 }
 
+/***************************************
+ * Function Name: addThread
+ * The Input: socket id of a client
+ * The Output: no output
+ * The Function Operation: adding a thread for
+ * the given client
+ **************************************/
 void Server::addThread(int client) {
 	pthread_t *newThread = new pthread_t();
 
@@ -388,6 +411,14 @@ void Server::addThread(int client) {
 	}
 }
 
+
+/***************************************
+ * Function Name: getVerbose
+ * The Input: no input
+ * The Output: boolean value
+ * The Function Operation: returning
+ * the value of the verbose
+ **************************************/
 bool Server::getVerbose() {
 	pthread_mutex_lock(&verboseMutex);
 	bool toReturn = verbose;
@@ -395,6 +426,13 @@ bool Server::getVerbose() {
 	return toReturn;
 }
 
+/***************************************
+ * Function Name: getExit
+ * The Input: no input
+ * The Output: boolean value
+ * The Function Operation: returning the
+ * value of the exit boolean member
+ **************************************/
 bool Server::getExit() {
 	pthread_mutex_lock(&serverExitMutex);
 	bool toReturn = serverExit;
@@ -402,7 +440,13 @@ bool Server::getExit() {
 	return toReturn;
 }
 
-
+/***************************************
+ * Function Name: setExit
+ * The Input: boolean value
+ * The Output: no output
+ * The Function Operation: updating the
+ * value of the exit boolean member
+ **************************************/
 void Server::setExit(bool exit) {
 	pthread_mutex_lock(&serverExitMutex);
 	serverExit = exit;
@@ -413,6 +457,16 @@ void Server::setExit(bool exit) {
 }
 
 //Outsider Functions
+
+
+/***************************************
+ * Function Name: extractCommand
+ * The Input: a reference to a message
+ * The Output: a pair of a command and
+ * a suitable vector of arguments
+ * The Function Operation: extracting a command
+ * based on the given message
+ **************************************/
 pair<string, vector<string> > extractCommand(string& msg) {
 	string command;
 	vector<string> args;
@@ -439,6 +493,13 @@ pair<string, vector<string> > extractCommand(string& msg) {
 	return make_pair(command, args);
 }
 
+/***************************************
+ * Function Name: gameThreadMain
+ * The Input: a pointer of an argument
+ * The Output: NULL
+ * The Function Operation: activating the main
+ * thread of the game
+ **************************************/
 void *gameThreadMain(void *arg) {
 	Server *theServer = (Server *) arg;
 	GameInfo *currGame = theServer->lastUsedGame;
@@ -466,6 +527,13 @@ void *gameThreadMain(void *arg) {
 	return NULL;
 }
 
+/***************************************
+ * Function Name: clientCommunicationThreadMain
+ * The Input: a pointer of an argument
+ * The Output: NULL
+ * The Function Operation: activating the main thread
+ * of the client's communication
+ **************************************/
 void* clientCommunicationThreadMain(void* arg) {
 	Server *theServer = (Server *) arg;
 	int currClientSocket = theServer->lastUsedClient;
@@ -494,6 +562,13 @@ void* clientCommunicationThreadMain(void* arg) {
 	return NULL;
 }
 
+/***************************************
+ * Function Name: exitThreadMain
+ * The Input: a pointer of an argument
+ * The Output: NULL
+ * The Function Operation: closing the main
+ * thread
+ **************************************/
 void* exitThreadMain(void* arg) {
 	Server *theServer = (Server *) arg;
 

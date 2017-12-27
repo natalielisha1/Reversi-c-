@@ -114,6 +114,18 @@ std::pair<int, int> extractPairFromString(std::string& theString) {
 	return make_pair(x,y);
 }
 
+/***************************************
+ * Function Name: splitString
+ * The Input: toSplit - a reference to
+ * 					  the string we want to split
+ * 					  splitter - a char that
+ * 					  represents the buffer
+ * The Output: a vector of strings that
+ *						 contains the splitted string
+ * The Function Operation: the function splits
+ * the given string according to the given splitter
+ * and puts the parts in a vector of strings
+ **************************************/
 vector<string> splitString(string& toSplit, char splitter) {
 	vector<string> toReturn;
 	char temp[2] = {0};

@@ -9,6 +9,13 @@
 
 using namespace std;
 
+/***************************************
+ * Function Name: CommandsManager (Constructor)
+ * The Input: a reference to a game set object
+ * The Output: commands manager instance
+ * The Function Operation: initializing the commands
+ * manager object
+ **************************************/
 CommandsManager::CommandsManager(GameSet& info) {
 	commandsMap["debug"] = new DebugCommand(info);
 	commandsMap["start"] = new StartMatchCommand(info);
@@ -18,6 +25,13 @@ CommandsManager::CommandsManager(GameSet& info) {
 	commandsMap["close"] = new CloseCommand(info);
 }
 
+/***************************************
+ * Function Name: ~CommandsManager (Destructor)
+ * The Input: no input
+ * The Output: no output
+ * The Function Operation: destructing
+ * the commands manager object
+ **************************************/
 CommandsManager::~CommandsManager() {
 	delete commandsMap["debug"];
 	delete commandsMap["start"];
@@ -27,6 +41,14 @@ CommandsManager::~CommandsManager() {
 	delete commandsMap["close"];
 }
 
+/***************************************
+ * Function Name: executeCommand
+ * The Input: sender's socket's id, a command
+ * and a vector of arguments
+ * The Output: no output
+ * The Function Operation: executing the
+ * given command
+ **************************************/
 void CommandsManager::executeCommand(int sender, string command, vector<string> args) {
 	Command *currCommand = commandsMap[command];
 	currCommand->execute(sender, args);
