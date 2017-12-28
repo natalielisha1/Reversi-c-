@@ -41,7 +41,9 @@ RemotePlayer::RemotePlayer(Board::Cell type): Player(type), client() {
 					result = client.readShortMessage();
 					if (result == "NULL") {
 						cout << "The server disconnected. goodbye." << endl;
-						exit(-1);
+						//type = empty, so the game will shutdown gracefully
+						this->type = Board::Empty;
+						return;
 					}
 				}
 				cout << "Your game ID is " << gameID << endl;
@@ -57,7 +59,9 @@ RemotePlayer::RemotePlayer(Board::Cell type): Player(type), client() {
 					option = 0;
 				} else if (result == "NULL") {
 					cout << "The server disconnected. goodbye." << endl;
-					exit(-1);
+					//type = empty, so the game will shutdown gracefully
+					this->type = Board::Empty;
+					return;
 				} else {
 					vector<string> availableGames = splitString(result, ',');
 					cout << "Available games: (enter the game index)" << endl;
@@ -93,7 +97,8 @@ RemotePlayer::RemotePlayer(Board::Cell type): Player(type), client() {
 		this->type = Board::X;
 	} else if (order == -1) {
 		cout << "The server disconnected. goodbye." << endl;
-		exit(-1);
+		//type = empty, so the game will shutdown gracefully
+		this->type = Board::Empty;
 	}
 }
 

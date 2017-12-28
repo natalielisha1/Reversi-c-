@@ -34,6 +34,7 @@ Server::Server(): serverSocket(0),
 	pthread_mutex_init(&lastGameMutex, NULL);
 	pthread_mutex_init(&lastClientMutex, NULL);
 	pthread_mutex_init(&coutMutex, NULL);
+	pthread_mutex_init(&serverExitMutex, NULL);
 }
 
 /***************************************
@@ -63,6 +64,7 @@ Server::Server(bool verbose): serverSocket(0),
 	pthread_mutex_init(&lastGameMutex, NULL);
 	pthread_mutex_init(&lastClientMutex, NULL);
 	pthread_mutex_init(&coutMutex, NULL);
+	pthread_mutex_init(&serverExitMutex, NULL);
 }
 
 /***************************************
@@ -83,6 +85,7 @@ Server::Server(int port): port(port), serverSocket(0),
 	pthread_mutex_init(&lastGameMutex, NULL);
 	pthread_mutex_init(&lastClientMutex, NULL);
 	pthread_mutex_init(&coutMutex, NULL);
+	pthread_mutex_init(&serverExitMutex, NULL);
 }
 
 /***************************************
@@ -103,6 +106,7 @@ Server::Server(int port, bool verbose): port(port), serverSocket(0),
 	pthread_mutex_init(&lastGameMutex, NULL);
 	pthread_mutex_init(&lastClientMutex, NULL);
 	pthread_mutex_init(&coutMutex, NULL);
+	pthread_mutex_init(&serverExitMutex, NULL);
 }
 
 /***************************************
@@ -238,6 +242,7 @@ void Server::start() {
 	for (vector<pthread_t *>::iterator it = gameThreads.begin(); it != gameThreads.end(); ++it) {
 		pthread_join(*(*it), NULL);
 	}
+	pthread_join(exitThread, NULL);
 
 	pthread_mutex_lock(&coutMutex);
 	cout << "All done. All communications are closed!" << endl;
@@ -581,7 +586,7 @@ void* exitThreadMain(void* arg) {
 	theServer->setExit(true);
 	pthread_mutex_lock(&theServer->coutMutex);
 	cout << "Closing all communications, please wait." << endl;
-	cout << "It may take up to 30 seconds" << endl;
+	cout << "It may take up to " << SOCKET_TIMEOUT << " seconds" << endl;
 	pthread_mutex_unlock(&theServer->coutMutex);
 
 	return NULL;

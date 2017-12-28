@@ -33,7 +33,7 @@
 #define RECV_FLAGS 0
 #define SEND_FLAGS 0
 
-#define SOCKET_TIMEOUT 30
+#define SOCKET_TIMEOUT 15
 
 class Server {
 public:

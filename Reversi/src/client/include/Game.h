@@ -53,6 +53,7 @@ public:
 	Player* getOPlayer();
 	Player* getXPlayer();
 
+	bool gameIsReady() const;
 private:
 	Board *gameBoard;
 	Player *xPlayer;

@@ -40,7 +40,10 @@ int main() {
 	} while (true);
 	//Creating the game
 	Game currGame = Game(HUMAN_PLAYER_IDENTIFIER, input);
-	//Running the game
-	currGame.run();
+	//Checking for server errors
+	if (currGame.gameIsReady()) {
+		//Running the game
+		currGame.run();
+	}
 	return 0;
 }

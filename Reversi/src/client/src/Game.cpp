@@ -609,3 +609,16 @@ Player* Game::getXPlayer() {
 	return xPlayer;
 }
 
+/***************************************
+ * Function Name: gameIsReady
+ * The Input: nothing
+ * The Output: if the server connection
+ *							failed
+ * The Function Operation: checking
+ * 											 for blank
+ * 											 player
+ **************************************/
+bool Game::gameIsReady() const {
+	return (xPlayer->getType() != Board::Empty) &&
+				 (oPlayer->getType() != Board::Empty);
+}
