@@ -1,9 +1,8 @@
-/*
-f * GameInfo.h
- *
- *  Created on: Dec 13, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex5
+ **************************************/
 
 #ifndef GAMEINFO_H_
 #define GAMEINFO_H_

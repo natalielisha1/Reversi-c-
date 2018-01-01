@@ -1,9 +1,8 @@
-/*
- * JoinCommand.h
- *
- *  Created on: Dec 13, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex5
+ **************************************/
 
 #ifndef JOINCOMMAND_H_
 #define JOINCOMMAND_H_

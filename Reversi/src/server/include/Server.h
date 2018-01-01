@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex4
+ * Exercise Name: Ex5
  **************************************/
 
 #ifndef SERVER_H_
@@ -80,7 +80,6 @@ private:
 
 	void addThread(int client);
 
-	bool handleClient(int sender, char curr, int reciever);
 	bool handleCommand(int client);
 
 	bool getVerbose();
@@ -91,8 +90,5 @@ private:
 
 //Outsider Functions
 std::pair<std::string, std::vector<std::string> > extractCommand(std::string& msg);
-void *gameThreadMain(void *arg);
-void *clientCommunicationThreadMain(void *arg);
-void *exitThreadMain(void *arg);
 
 #endif /* SERVER_H_ */
