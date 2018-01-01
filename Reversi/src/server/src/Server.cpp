@@ -1,11 +1,15 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex4
+ * Exercise Name: Ex5
  **************************************/
 
 #include "Server.h"
 using namespace std;
+
+void *gameThreadMain(void *arg);
+void *clientCommunicationThreadMain(void *arg);
+void *exitThreadMain(void *arg);
 
 /***************************************
  * Function Name: Server (Constructor)
@@ -261,63 +265,6 @@ void Server::stop() {
 }
 
 /***************************************
- * Function Name: handleClient
- * The Input: clients' sockets, and the
- *  current client
- * The Output: true - the handling
- *  succeeded (and the game is still
- *  running)
- *             false - otherwise
- * The Function Operation: getting message
- *  from clientA, checking it, and sending
- *  it to clientB (if required)
- **************************************/
-bool Server::handleClient(int sender, char curr, int reciever) {
-	//Creating string to check for game ending
-	string endConnection = "END";
-	//Creating a buffer
-	char buffer[BUFFER_SIZE] = {0};
-	//Creating vars to keep the sockets' responses
-	int readSize;
-	int writeSize;
-	while (true) {
-		//Reading the message
-		readSize = recv(sender, buffer, BUFFER_SIZE, RECV_FLAGS);
-		while (readSize == -1) {
-			//Re-reading the message (timeout)
-			readSize = recv(sender, buffer, BUFFER_SIZE, RECV_FLAGS);
-		}
-		if (readSize == 0) {
-			//Client disconnection
-			cout << "Client " << curr << " disconnected" << endl;
-			return false;
-		} else if (strcmp(endConnection.c_str(), buffer) == 0) {
-			//Game ending
-			cout << "Game ended!" << endl;
-			return false;
-		} else if (getVerbose()) {
-			cout << buffer;
-		}
-
-		//Writing the message to the other client
-		writeSize = send(reciever, buffer, strlen(buffer), SEND_FLAGS);
-		while (writeSize == -1) {
-			//Re-writing the message (timeout)
-			writeSize = send(reciever, buffer, strlen(buffer), SEND_FLAGS);
-		}
-
-		if (writeSize != BUFFER_SIZE) {
-			//The message received completely
-			if (getVerbose()) {
-				cout << endl;
-			}
-			return true;
-		}
-	}
-	return true;
-}
-
-/***************************************
  * Function Name: handleCommand
  * The Input: socket id of a client
  * The Output: boolean value (true or false)
@@ -502,8 +449,8 @@ pair<string, vector<string> > extractCommand(string& msg) {
  * Function Name: gameThreadMain
  * The Input: a pointer of an argument
  * The Output: NULL
- * The Function Operation: activating the main
- * thread of the game
+ * The Function Operation: the main
+ * function of the game's thread
  **************************************/
 void *gameThreadMain(void *arg) {
 	Server *theServer = (Server *) arg;
@@ -536,10 +483,10 @@ void *gameThreadMain(void *arg) {
  * Function Name: clientCommunicationThreadMain
  * The Input: a pointer of an argument
  * The Output: NULL
- * The Function Operation: activating the main thread
- * of the client's communication
+ * The Function Operation: the main function
+ * of the client's communication thread
  **************************************/
-void* clientCommunicationThreadMain(void* arg) {
+void *clientCommunicationThreadMain(void *arg) {
 	Server *theServer = (Server *) arg;
 	int currClientSocket = theServer->lastUsedClient;
 
@@ -571,10 +518,10 @@ void* clientCommunicationThreadMain(void* arg) {
  * Function Name: exitThreadMain
  * The Input: a pointer of an argument
  * The Output: NULL
- * The Function Operation: closing the main
- * thread
+ * The Function Operation: the main function
+ * of the "exit" thread
  **************************************/
-void* exitThreadMain(void* arg) {
+void *exitThreadMain(void *arg) {
 	Server *theServer = (Server *) arg;
 
 	string input = "";

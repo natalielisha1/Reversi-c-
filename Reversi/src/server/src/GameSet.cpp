@@ -1,9 +1,8 @@
-/*
- * GameSet.cpp
- *
- *  Created on: Dec 15, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex5
+ **************************************/
 
 #include "GameSet.h"
 
@@ -11,7 +10,7 @@ using namespace std;
 
 /***************************************
  * Function Name: GameSet
- * The Input: last command and last
+ * The Input: no input
  * 					  command result
  * The Output: a GameSet instance
  * The Function Operation: initializing
@@ -30,7 +29,6 @@ GameSet::GameSet(): lastCommand(GameSet::Debug), lastCommandResult(-1) {
 	noArgsErrorMessage = string("-2");
 	gameDoesNotExistErrorMessage = string("-6");
 	gameFullErrorMessage = string("-7");
-	//noAvailableSlotErrorMessage = string("-8");
 
 	//Mutex initializing
 	pthread_mutex_init(&matchesMutex, NULL);
@@ -57,8 +55,9 @@ GameSet::~GameSet() {
  * client socket and a vector of strings that
  * contains the arguments
  * The Output: no output
- * The Function Operation: debugging the message
- * in case there are errors
+ * The Function Operation: sending debug
+ * 			   info to the
+ *			   client
  **************************************/
 void GameSet::debugMessage(int clientSocket, vector<string> args) {
 	string toSend = "";
@@ -412,7 +411,9 @@ bool GameSet::removeGame(GameInfo *currGame) {
  * to the message that need to be sent to that client
  * The Output: true if the process succeed,
  * otherwise false
- * The Function Operation:
+ * The Function Operation: sending the
+ *			   message to
+ *		           the client
  **************************************/
 bool GameSet::sendMessageToClient(int client, string& msg) {
 	int writeSize;
@@ -430,7 +431,7 @@ bool GameSet::sendMessageToClient(int client, string& msg) {
  * The Input: no input
  * The Output: command option
  * The Function Operation: getting
- * the last command in the current game
+ * the last command sent to the server
  **************************************/
 GameSet::CommandOption GameSet::getLastCommand() const {
 	return lastCommand;
@@ -441,7 +442,7 @@ GameSet::CommandOption GameSet::getLastCommand() const {
  * The Input: no input
  * The Output: command result
  * The Function Operation: getting
- * the last command result in the current game
+ * the last command result in the server
  **************************************/
 int GameSet::getLastCommandResult() const {
 	return lastCommandResult;

@@ -1,9 +1,8 @@
-/*
- * DebugCommand.cpp
- *
- *  Created on: Dec 13, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex5
+ **************************************/
 
 #include "DebugCommand.h"
 
@@ -34,7 +33,13 @@ DebugCommand::~DebugCommand() {
  * The Input: id of a client's socket and
  * a vector of arguments
  * The Output: no output
- * The Function Operation: debugging a command
+ * The Function Operation: sending
+ *                         info regarding
+ *			   the last command
+ *			   and info about
+ *			   currently 
+ *			   available
+ *			   games
  **************************************/
 void DebugCommand::execute(int sender, vector<string> args) {
 	info.debugMessage(sender, args);

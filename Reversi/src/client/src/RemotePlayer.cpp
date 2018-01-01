@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex4
+ * Exercise Name: Ex5
  **************************************/
 
 #include "RemotePlayer.h"

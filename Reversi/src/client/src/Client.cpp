@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex4
+ * Exercise Name: Ex5
  **************************************/
 
 #include "Client.h"
@@ -138,7 +138,8 @@ string Client::readMessage() {
  * The Input: no input
  * The Output: the short message
  * The Function Operation: the function
- * send a short lenghted message
+ * reads a short message ("OK" or -something)
+ * to represent an error
  **************************************/
 string Client::readShortMessage() {
 	//Preparing the string to return

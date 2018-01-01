@@ -1,9 +1,8 @@
-/*
- * GameSet.h
- *
- *  Created on: Dec 15, 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex5
+ **************************************/
 
 #ifndef GAMESET_H_
 #define GAMESET_H_
@@ -31,7 +30,6 @@
 #define ERROR_FAKE_NO_MOVE_RESULT -5
 #define ERROR_GAME_DOES_NOT_EXIST_RESULT -6
 #define ERROR_GAME_FULL_RESULT -7
-//#define ERROR_NO_AVAILABLE_SLOT_RESULT -8
 
 class GameSet {
 public:
@@ -86,7 +84,6 @@ private:
 	std::string noArgsErrorMessage;
 	std::string gameFullErrorMessage;
 	std::string gameDoesNotExistErrorMessage;
-	//std::string noAvailableSlotErrorMessage;
 };
 
 #endif /* GAMESET_H_ */

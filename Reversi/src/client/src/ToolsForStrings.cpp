@@ -1,7 +1,7 @@
 /***************************************
  * Student Name: Ofek Segal and Natalie Elisha
  * Student ID: 315638288, 209475458
- * Exercise Name: Ex4
+ * Exercise Name: Ex5
  **************************************/
 
 #include "ToolsForStrings.h"
@@ -117,13 +117,12 @@ std::pair<int, int> extractPairFromString(std::string& theString) {
 /***************************************
  * Function Name: splitString
  * The Input: toSplit - a reference to
- * 					  the string we want to split
- * 					  splitter - a char that
- * 					  represents the buffer
+ * 	            	the string we want to split
+ * 	      splitter - a char to split around
  * The Output: a vector of strings that
- *						 contains the splitted string
+ *	       contains the splitted string
  * The Function Operation: the function splits
- * the given string according to the given splitter
+ * the given string arround the given splitter
  * and puts the parts in a vector of strings
  **************************************/
 vector<string> splitString(string& toSplit, char splitter) {

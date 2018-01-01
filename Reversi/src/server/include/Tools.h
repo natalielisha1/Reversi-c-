@@ -1,9 +1,8 @@
-/*
- * Tools.cpp
- *
- *  Created on: 22 בדצמ 2017
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex5
+ **************************************/
 
 #ifndef TOOLS_H_
 #define TOOLS_H_
