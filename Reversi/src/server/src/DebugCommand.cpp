@@ -34,7 +34,7 @@ DebugCommand::~DebugCommand() {
  * a vector of arguments
  * The Output: no output
  * The Function Operation: executing the debug command.
- * if the game exists, it the "debug" command returns it's
+ * if the game exists, the "debug" command returns its
  * state, otherwise it returns an error
  **************************************/
 void DebugCommand::execute(int sender, vector<string> args) {

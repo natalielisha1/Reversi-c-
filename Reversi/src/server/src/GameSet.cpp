@@ -371,7 +371,6 @@ void GameSet::interruptMatches() {
  * The Function Operation: removing the current game
  **************************************/
 bool GameSet::removeGame(GameInfo *currGame) {
-	//GameInfo *currGame = getGameInfo(client);
 	if (currGame == NULL) {
 		return false;
 	} else {
