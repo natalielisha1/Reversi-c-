@@ -11,7 +11,6 @@ using namespace std;
 /***************************************
  * Function Name: GameSet
  * The Input: no input
- * 					  command result
  * The Output: a GameSet instance
  * The Function Operation: initializing
  * the game set
@@ -412,8 +411,8 @@ bool GameSet::removeGame(GameInfo *currGame) {
  * The Output: true if the process succeed,
  * otherwise false
  * The Function Operation: sending the
- *			   message to
- *		           the client
+ *			   			   message to
+ *		           		   the client
  **************************************/
 bool GameSet::sendMessageToClient(int client, string& msg) {
 	int writeSize;
