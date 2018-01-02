@@ -159,7 +159,7 @@ TEST(GameTest, ALotOfMovesAvailable) {
   delete vPoints3;
 }
 
-TEST(GameTest, DebuggigSpecificState) {
+TEST(GameTest, DebuggingSpecificState) {
 	Game game('b', 'b');
 
 	game.getGameBoard()->putClean(Point(7,6), Board::O);
@@ -227,7 +227,10 @@ TEST(GameTest, DebuggigSpecificState) {
 	game.getGameBoard()->putClean(Point(8,7), Board::X);
 
 	vector<Point>* xOptions = game.calcMoves(Board::X);
-	Point firstMove = xOptions->begin();
+	if (xOptions->size() < 1) {
+	  throw runtime_error("error - no moves when there should be");
+	}
+	Point firstMove = *(xOptions->begin());
 	if (xOptions->size() != 1 || firstMove != Point(8,8)) {
 		throw runtime_error("error - something's wrong with calcMoves function");
 	}
