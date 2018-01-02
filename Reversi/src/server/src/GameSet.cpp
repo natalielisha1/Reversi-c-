@@ -11,8 +11,7 @@ using namespace std;
 
 /***************************************
  * Function Name: GameSet
- * The Input: last command and last
- * 					  command result
+ * The Input: no input
  * The Output: a GameSet instance
  * The Function Operation: initializing
  * the game set

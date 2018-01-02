@@ -159,3 +159,29 @@ TEST(GameTest, ALotOfMovesAvailable) {
   delete vPoints3;
 }
 
+//TEST(GameTest, DebuggigSpecificState) {
+//	Game game('b', 'b');
+//
+//	game.getGameBoard()->putClean(Point(7,6), Board::O);
+//	game.getGameBoard()->putClean(Point(6,5), Board::O);
+//	game.getGameBoard()->putClean(Point(7,4), Board::X);
+//	game.getGameBoard()->putClean(Point(6,4), Board::X);
+//	game.getGameBoard()->putClean(Point(5,4), Board::X);
+//	game.getGameBoard()->putClean(Point(3,5), Board::O);
+//	game.getGameBoard()->putClean(Point(4,5), Board::O);
+//	game.getGameBoard()->putClean(Point(5,5), Board::O);
+//	game.getGameBoard()->putClean(Point(5,6), Board::X);
+//	game.getGameBoard()->putClean(Point(5,5), Board::X);
+//	game.getGameBoard()->putClean(Point(6,5), Board::X);
+//
+//
+//
+////	if (!game.put(Point(4,3), Board::O)) {
+////		throw runtime_error("put failed to put (4,3) as O somehow");
+////	} else if (game.getGameBoard()->getCell(Point(4,4)) != Board::O
+////			|| game.getGameBoard()->getCell(Point(5,4)) != Board::O
+////			|| game.getGameBoard()->getCell(Point(6,5)) != Board::O) {
+////		throw runtime_error("put didn't change one or more of the three cells");
+////	}
+//}
+

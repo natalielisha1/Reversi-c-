@@ -34,7 +34,9 @@ DebugCommand::~DebugCommand() {
  * The Input: id of a client's socket and
  * a vector of arguments
  * The Output: no output
- * The Function Operation: debugging a command
+ * The Function Operation: executing the debug command.
+ * if the game exists, it the "debug" command returns it's
+ * state, otherwise it returns an error
  **************************************/
 void DebugCommand::execute(int sender, vector<string> args) {
 	info.debugMessage(sender, args);
