@@ -159,29 +159,84 @@ TEST(GameTest, ALotOfMovesAvailable) {
   delete vPoints3;
 }
 
-//TEST(GameTest, DebuggigSpecificState) {
-//	Game game('b', 'b');
-//
-//	game.getGameBoard()->putClean(Point(7,6), Board::O);
-//	game.getGameBoard()->putClean(Point(6,5), Board::O);
-//	game.getGameBoard()->putClean(Point(7,4), Board::X);
-//	game.getGameBoard()->putClean(Point(6,4), Board::X);
-//	game.getGameBoard()->putClean(Point(5,4), Board::X);
-//	game.getGameBoard()->putClean(Point(3,5), Board::O);
-//	game.getGameBoard()->putClean(Point(4,5), Board::O);
-//	game.getGameBoard()->putClean(Point(5,5), Board::O);
-//	game.getGameBoard()->putClean(Point(5,6), Board::X);
-//	game.getGameBoard()->putClean(Point(5,5), Board::X);
-//	game.getGameBoard()->putClean(Point(6,5), Board::X);
-//
-//
-////	if (!game.put(Point(4,3), Board::O)) {
-////		throw runtime_error("put failed to put (4,3) as O somehow");
-////	} else if (game.getGameBoard()->getCell(Point(4,4)) != Board::O
-////			|| game.getGameBoard()->getCell(Point(5,4)) != Board::O
-////			|| game.getGameBoard()->getCell(Point(6,5)) != Board::O) {
-////		throw runtime_error("put didn't change one or more of the three cells");
-////	}
-//}
+TEST(GameTest, DebuggigSpecificState) {
+	Game game('b', 'b');
 
+	game.getGameBoard()->putClean(Point(7,6), Board::O);
+	game.getGameBoard()->putClean(Point(6,5), Board::O);
+	game.getGameBoard()->putClean(Point(7,4), Board::O);
+	game.getGameBoard()->putClean(Point(6,4), Board::O);
+	game.getGameBoard()->putClean(Point(5,4), Board::O);
+	game.getGameBoard()->putClean(Point(3,5), Board::O);
+	game.getGameBoard()->putClean(Point(4,5), Board::O);
+	game.getGameBoard()->putClean(Point(5,5), Board::X);
+	game.getGameBoard()->putClean(Point(5,6), Board::O);
+	game.getGameBoard()->putClean(Point(1,1), Board::O);
+	game.getGameBoard()->putClean(Point(1,2), Board::O);
+	game.getGameBoard()->putClean(Point(1,3), Board::O);
+	game.getGameBoard()->putClean(Point(1,4), Board::O);
+	game.getGameBoard()->putClean(Point(1,5), Board::O);
+	game.getGameBoard()->putClean(Point(1,6), Board::O);
+	game.getGameBoard()->putClean(Point(1,7), Board::O);
+	game.getGameBoard()->putClean(Point(1,8), Board::O);
+	game.getGameBoard()->putClean(Point(2,1), Board::O);
+	game.getGameBoard()->putClean(Point(2,2), Board::O);
+	game.getGameBoard()->putClean(Point(2,3), Board::O);
+	game.getGameBoard()->putClean(Point(2,4), Board::O);
+	game.getGameBoard()->putClean(Point(2,5), Board::O);
+	game.getGameBoard()->putClean(Point(2,6), Board::O);
+	game.getGameBoard()->putClean(Point(2,7), Board::O);
+	game.getGameBoard()->putClean(Point(2,8), Board::O);
+	game.getGameBoard()->putClean(Point(3,1), Board::O);
+	game.getGameBoard()->putClean(Point(3,2), Board::X);
+	game.getGameBoard()->putClean(Point(3,3), Board::O);
+	game.getGameBoard()->putClean(Point(3,4), Board::O);
+	game.getGameBoard()->putClean(Point(3,6), Board::X);
+	game.getGameBoard()->putClean(Point(3,7), Board::X);
+	game.getGameBoard()->putClean(Point(3,8), Board::O);
+	game.getGameBoard()->putClean(Point(4,1), Board::O);
+	game.getGameBoard()->putClean(Point(4,2), Board::X);
+	game.getGameBoard()->putClean(Point(4,3), Board::O);
+	game.getGameBoard()->putClean(Point(4,4), Board::O);
+	game.getGameBoard()->putClean(Point(4,6), Board::O);
+	game.getGameBoard()->putClean(Point(4,7), Board::X);
+	game.getGameBoard()->putClean(Point(4,8), Board::O);
+	game.getGameBoard()->putClean(Point(5,1), Board::O);
+	game.getGameBoard()->putClean(Point(5,2), Board::X);
+	game.getGameBoard()->putClean(Point(5,3), Board::O);
+	game.getGameBoard()->putClean(Point(5,7), Board::X);
+	game.getGameBoard()->putClean(Point(5,8), Board::O);
+	game.getGameBoard()->putClean(Point(6,1), Board::O);
+	game.getGameBoard()->putClean(Point(6,2), Board::O);
+	game.getGameBoard()->putClean(Point(6,3), Board::X);
+	game.getGameBoard()->putClean(Point(6,6), Board::X);
+	game.getGameBoard()->putClean(Point(6,7), Board::O);
+	game.getGameBoard()->putClean(Point(6,8), Board::O);
+	game.getGameBoard()->putClean(Point(7,1), Board::O);
+	game.getGameBoard()->putClean(Point(7,2), Board::X);
+	game.getGameBoard()->putClean(Point(7,3), Board::O);
+	game.getGameBoard()->putClean(Point(7,5), Board::O);
+	game.getGameBoard()->putClean(Point(7,7), Board::O);
+	game.getGameBoard()->putClean(Point(7,8), Board::O);
+	game.getGameBoard()->putClean(Point(8,1), Board::X);
+	game.getGameBoard()->putClean(Point(8,2), Board::X);
+	game.getGameBoard()->putClean(Point(8,3), Board::X);
+	game.getGameBoard()->putClean(Point(8,4), Board::X);
+	game.getGameBoard()->putClean(Point(8,5), Board::X);
+	game.getGameBoard()->putClean(Point(8,6), Board::X);
+	game.getGameBoard()->putClean(Point(8,7), Board::X);
 
+	vector<Point>* xOptions = game.calcMoves(Board::X);
+	Point firstMove = xOptions->begin();
+	if (xOptions->size() != 1 || firstMove != Point(8,8)) {
+		throw runtime_error("error - something's wrong with calcMoves function");
+	}
+
+	if (game.getBestMove(xOptions, Board::X) != Point(8,8)) {
+		throw runtime_error("error - getBestMove returns the wrong move");
+	}
+
+	if (game.getCurrentStatus() != Game::InProgress) {
+		throw runtime_error("error in game's status");
+	}
+}
