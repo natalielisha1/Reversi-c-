@@ -33,6 +33,23 @@ RemotePlayer::RemotePlayer(Board::Cell type): Player(type), client() {
 			case 1: {
 				result = "";
 				gameID = "";
+				/*
+				 * The game will create a unique identifier
+				 * so there will be collisions in a very
+				 * small probability (2 client should create
+				 * the id in the exact same second, because
+				 * the id is time based (HHMMSS, to be exact)
+				 * and that will protect me from all sorts of
+				 * weird situations that could happen with
+				 * custom game name (unsupported characters,
+				 * spaces, collisions, and many more)
+				 * Also, for the off-chance that there would
+				 * be collisions (same second) the game will
+				 * create a second identifier and try it as
+				 * well, and a second collision is now in
+				 * even smaller probability and is very
+				 * unrealistic
+				 */
 				while (result != "OK") {
 					gameID = client.genUniqueGameIdentifier();
 					msgToSend = "start ";
@@ -46,11 +63,21 @@ RemotePlayer::RemotePlayer(Board::Cell type): Player(type), client() {
 						return;
 					}
 				}
+				/*
+				 * Sending the user the id, so
+				 * if the user would like to play against
+				 * a friend, the user could tell the friend
+				 * what the game id is
+				 */
 				cout << "Your game ID is " << gameID << endl;
 				cout << "Waiting for a player to join the game..." << endl;
 				break;
 			}
 			case 2: {
+				/*
+				 * The user get the list of available
+				 * games and chooses the one to join
+				 */
 				msgToSend = "list_games";
 				client.sendMessage(msgToSend.c_str());
 				result = client.readMessage();
