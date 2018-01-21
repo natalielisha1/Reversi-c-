@@ -10,11 +10,13 @@
 #include <vector>
 #include <string>
 
+#include "CommandResult.h"
+
 class Command {
 public:
 	virtual ~Command();
 
-	virtual void execute(int sender, std::vector<std::string> args) = 0;
+	virtual CommandResult execute(int sender, std::vector<std::string> args) = 0;
 };
 
 #endif /* COMMAND_H_ */

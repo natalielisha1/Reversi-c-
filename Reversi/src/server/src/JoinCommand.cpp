@@ -14,8 +14,8 @@ using namespace std;
  * The Output: joinCommand instance
  * The Function Operation: currently nothing
  **************************************/
-JoinCommand::JoinCommand(GameSet &info): info(info) {
-	//Nothing right now
+JoinCommand::JoinCommand(){
+	games = GameSet::getInstance();
 }
 
 /***************************************
@@ -36,6 +36,6 @@ JoinCommand::~JoinCommand() {
  * The Function Operation: adding the sender (a client)
  * to a match
  **************************************/
-void JoinCommand::execute(int sender, vector<string> args) {
-	info.joinMatch(sender, args);
+CommandResult JoinCommand::execute(int sender, vector<string> args) {
+	return games->joinMatch(sender, args);
 }

@@ -15,13 +15,13 @@
 
 class ListGamesCommand: public Command {
 public:
-	ListGamesCommand(GameSet& info);
+	ListGamesCommand();
 	virtual ~ListGamesCommand();
 
-	virtual void execute(int sender, std::vector<std::string> args);
+	virtual CommandResult execute(int sender, std::vector<std::string> args);
 
 private:
-	GameSet& info;
+	GameSet *games;
 };
 
 #endif /* LISTGAMESCOMMAND_H_ */

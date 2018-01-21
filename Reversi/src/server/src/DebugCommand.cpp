@@ -14,8 +14,8 @@ using namespace std;
  * The Output: instance of a debug command
  * The Function Operation: currently nothing
  **************************************/
-DebugCommand::DebugCommand(GameSet &info): info(info) {
-	//Nothing right now
+DebugCommand::DebugCommand() {
+	games = GameSet::getInstance();
 }
 
 /***************************************
@@ -37,6 +37,6 @@ DebugCommand::~DebugCommand() {
  * if the game exists, the "debug" command returns its
  * state, otherwise it returns an error
  **************************************/
-void DebugCommand::execute(int sender, vector<string> args) {
-	info.debugMessage(sender, args);
+CommandResult DebugCommand::execute(int sender, vector<string> args) {
+	return games->debugMessage(sender, args);
 }

@@ -22,18 +22,19 @@
 #include <map>
 #include <utility>
 
+#include "VerboseController.h"
 #include "CommandsManager.h"
 #include "GameInfo.h"
 #include "Tools.h"
+#include "ThreadPool.h"
+#include "ClientRequestsTask.h"
 
 #define MAX_CONNECTED_CLIENTS 10
+#define MAX_THREADS 10
 
-#define BUFFER_SIZE 2000
-
-#define RECV_FLAGS 0
 #define SEND_FLAGS 0
 
-#define SOCKET_TIMEOUT 15
+#define SOCKET_TIMEOUT 5
 
 class Server {
 public:
@@ -52,37 +53,40 @@ public:
 	friend void *clientCommunicationThreadMain(void *arg);
 	friend void *exitThreadMain(void *arg);
 private:
-	bool verbose;
-	pthread_mutex_t verboseMutex;
+//	pthread_mutex_t verboseMutex;
 
 	int port;
 	int serverSocket;
 	struct sockaddr_in server;
 
-	GameSet games;
-	pthread_mutex_t gamesMutex;
+	//GameSet games;
+	//pthread_mutex_t gamesMutex;
 
-	CommandsManager cmdManager;
+	CommandsManager *cmdManager;
 
-	std::vector<pthread_t *> gameThreads;
-	std::vector<pthread_t *> clientCommunicationThreads;
+	ThreadPool *threadPool;
 
-	GameInfo *lastUsedGame;
-	pthread_mutex_t lastGameMutex;
+//	std::vector<pthread_t *> gameThreads;
+//	std::vector<pthread_t *> clientCommunicationThreads;
 
-	int lastUsedClient;
-	pthread_mutex_t lastClientMutex;
+//	GameInfo *lastUsedGame;
+//	pthread_mutex_t lastGameMutex;
 
-	pthread_mutex_t coutMutex;
+//	int lastUsedClient;
+//	pthread_mutex_t lastClientMutex;
+
+	std::vector<int> connectedClients;
+
+	VerboseController *verbose;
 
 	bool serverExit;
 	pthread_mutex_t serverExitMutex;
 
 	void addThread(int client);
 
-	bool handleCommand(int client);
-
 	bool getVerbose();
+
+	bool handleCommand(int client);
 
 	bool getExit();
 	void setExit(bool exit);

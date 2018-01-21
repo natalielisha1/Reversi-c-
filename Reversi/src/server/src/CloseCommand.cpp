@@ -14,8 +14,8 @@ using namespace std;
  * The Output: a closeCommand instance
  * The Function Operation: currently nothing
  **************************************/
-CloseCommand::CloseCommand(GameSet &info): info(info) {
-	//Nothing right now
+CloseCommand::CloseCommand() {
+	games = GameSet::getInstance();
 }
 
 /***************************************
@@ -35,6 +35,6 @@ CloseCommand::~CloseCommand() {
  * The Function Operation: closing the
  *			   game
  **************************************/
-void CloseCommand::execute(int sender, vector<string> args) {
-	info.closeMatch(sender, args);
+CommandResult CloseCommand::execute(int sender, vector<string> args) {
+	return games->closeMatch(sender, args);
 }

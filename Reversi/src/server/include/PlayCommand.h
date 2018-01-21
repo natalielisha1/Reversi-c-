@@ -15,13 +15,13 @@
 
 class PlayCommand: public Command {
 public:
-	PlayCommand(GameSet& info);
+	PlayCommand();
 	virtual ~PlayCommand();
 
-	virtual void execute(int sender, std::vector<std::string> args);
+	virtual CommandResult execute(int sender, std::vector<std::string> args);
 
 private:
-	GameSet& info;
+	GameSet *games;
 };
 
 #endif /* PLAYCOMMAND_H_ */

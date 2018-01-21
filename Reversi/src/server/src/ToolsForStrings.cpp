@@ -113,3 +113,37 @@ std::pair<int, int> extractPairFromString(std::string& theString) {
 
 	return make_pair(x,y);
 }
+
+/***************************************
+ * Function Name: extractCommand
+ * The Input: a reference to a message
+ * The Output: a pair of a command and
+ * a suitable vector of arguments
+ * The Function Operation: extracting a command
+ * based on the given message
+ **************************************/
+pair<string, vector<string> > extractCommand(string& msg) {
+	string command;
+	vector<string> args;
+	string currentWord = "";
+	bool foundCommand = false;
+
+	if (msg.find(" ") == string::npos) {
+		return make_pair(msg, args);
+	}
+
+	size_t index = 0;
+	while ((index = msg.find(" ")) != string::npos) {
+		currentWord = msg.substr(0, index);
+		if (!foundCommand) {
+			command = currentWord;
+			foundCommand = true;
+		} else {
+			args.push_back(currentWord);
+		}
+		msg = msg.substr(index + 1);
+	}
+	args.push_back(msg);
+
+	return make_pair(command, args);
+}

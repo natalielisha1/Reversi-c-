@@ -14,8 +14,8 @@ using namespace std;
  * The Output: ListGamesCommand instance
  * The Function Operation: currently nothing
  **************************************/
-ListGamesCommand::ListGamesCommand(GameSet &info): info(info) {
-	//Nothing right now
+ListGamesCommand::ListGamesCommand() {
+	games = GameSet::getInstance();
 }
 
 /***************************************
@@ -36,6 +36,6 @@ ListGamesCommand::~ListGamesCommand() {
  * The Function Operation: listing the matches according
  * the given sender socket id and arguments
  **************************************/
-void ListGamesCommand::execute(int sender, vector<string> args) {
-	info.listMatches(sender);
+CommandResult ListGamesCommand::execute(int sender, vector<string> args) {
+	return games->listMatches(sender);
 }

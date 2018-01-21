@@ -14,8 +14,8 @@ using namespace std;
  * The Output: instance of StartMatchCommand
  * The Function Operation: currently nothing
  **************************************/
-StartMatchCommand::StartMatchCommand(GameSet &info): info(info) {
-	//Nothing right now
+StartMatchCommand::StartMatchCommand() {
+	games = GameSet::getInstance();
 }
 
 /***************************************
@@ -35,6 +35,6 @@ StartMatchCommand::~StartMatchCommand() {
  * The Output: no output
  * The Function Operation: starting a new match
  **************************************/
-void StartMatchCommand::execute(int sender, vector<string> args) {
-	info.startNewMatch(sender, args);
+CommandResult StartMatchCommand::execute(int sender, vector<string> args) {
+	return games->startNewMatch(sender, args);
 }

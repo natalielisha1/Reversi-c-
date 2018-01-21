@@ -29,12 +29,13 @@ int main(int argc, char *argv[]) {
 	try {
 		//Running the server
 		server.start();
+
+		//Stopping the server
+		server.stop();
 	} catch (const char *msg) {
 		//Catching an error
 		cout << "Cannot start server. Reason: " << msg << endl;
 		return -1;
 	}
-	//Stopping the server
-	server.stop();
 	return 0;
 }

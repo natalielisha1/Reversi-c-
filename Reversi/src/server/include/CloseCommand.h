@@ -15,13 +15,13 @@
 
 class CloseCommand: public Command {
 public:
-	CloseCommand(GameSet& info);
+	CloseCommand();
 	virtual ~CloseCommand();
 
-	virtual void execute(int sender, std::vector<std::string> args);
+	virtual CommandResult execute(int sender, std::vector<std::string> args);
 
 private:
-	GameSet& info;
+	GameSet *games;
 };
 
 #endif /* CLOSECOMMAND_H_ */

@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <pthread.h>
 
 #include "Command.h"
 #include "DebugCommand.h"
@@ -19,15 +20,23 @@
 #include "PlayCommand.h"
 #include "CloseCommand.h"
 
-#include "GameSet.h"
-
 class CommandsManager {
 public:
-	CommandsManager(GameSet& info);
+	static void initialize();
+
+	static CommandsManager *getInstance();
+
+	static void deleteInstance();
+
+	CommandResult executeCommand(int sender, std::string command, std::vector<std::string> args);
+
+private:
+	static CommandsManager *theInstance;
+	static pthread_mutex_t lock;
+
+	CommandsManager();
 	~CommandsManager();
 
-	void executeCommand(int sender, std::string command, std::vector<std::string> args);
-private:
 	std::map<std::string, Command *> commandsMap;
 };
 

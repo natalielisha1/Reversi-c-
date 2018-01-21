@@ -7,6 +7,7 @@
 #ifndef GAMESET_H_
 #define GAMESET_H_
 
+#include "CommandResult.h"
 #include "GameInfo.h"
 #include "ToolsForStrings.h"
 #include "Tools.h"
@@ -18,43 +19,35 @@
 #include <vector>
 #include <pthread.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #define SEND_FLAGS 0
 
-//Predefined error results
-#define NO_ERROR_RESULT 1
-#define ERROR_GAME_EXISTS_RESULT -1
-#define ERROR_NO_ARGS_RESULT -2
-#define ERROR_INVALID_CLIENT_RESULT -3
-#define ERROR_GAME_NOT_PLAYING_RESULT -4
-#define ERROR_FAKE_NO_MOVE_RESULT -5
-#define ERROR_GAME_DOES_NOT_EXIST_RESULT -6
-#define ERROR_GAME_FULL_RESULT -7
-
 class GameSet {
 public:
-	enum CommandOption {Debug, Start, Join, Play, Close, List};
+	static void initialize();
 
-	GameSet();
-	~GameSet();
+	static GameSet *getInstance();
 
-	void debugMessage(int clientSocket, std::vector<std::string>);
+	static void deleteInstance();
 
-	void startNewMatch(int clientASocket, std::vector<std::string> args);
+	CommandResult debugMessage(int clientSocket, std::vector<std::string>);
 
-	void joinMatch(int clientBSocket, std::vector<std::string> args);
+	CommandResult startNewMatch(int clientASocket, std::vector<std::string> args);
 
-	void playMatch(int senderClient, std::string xLoc, std::string yLoc);
+	CommandResult joinMatch(int clientBSocket, std::vector<std::string> args);
 
-	void playMatch(int senderClient, std::string noMove);
+	CommandResult playMatch(int senderClient, std::string xLoc, std::string yLoc);
 
-	void closeMatch(int senderClient, std::vector<std::string> args);
+	CommandResult playMatch(int senderClient, std::string noMove);
 
-	void listMatches(int senderClient);
+	CommandResult closeMatch(int senderClient, std::vector<std::string> args);
+
+	CommandResult listMatches(int senderClient);
 
 	void interruptMatches();
 
-	GameSet::CommandOption getLastCommand() const;
+	CommandResult::CommandOption getLastCommand() const;
 
 	int getLastCommandResult() const;
 
@@ -62,10 +55,20 @@ public:
 
 	bool removeGame(GameInfo *currGame);
 private:
+	static GameSet *theInstance;
+	static pthread_mutex_t lock;
+
+	GameSet();
+	~GameSet();
+
 	std::vector<GameInfo *>matches;
 	std::map<int, GameInfo *> matchClientMap;
-	GameSet::CommandOption lastCommand;
+
+	CommandResult::CommandOption lastCommand;
 	int lastCommandResult;
+
+	pthread_mutex_t lastCommandMutex;
+
 	pthread_mutex_t matchesMutex;
 	pthread_mutex_t clientMapMutex;
 	pthread_mutex_t stringsMutex;

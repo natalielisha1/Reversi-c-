@@ -15,13 +15,13 @@
 
 class DebugCommand: public Command {
 public:
-	DebugCommand(GameSet& info);
+	DebugCommand();
 	virtual ~DebugCommand();
 
-	virtual void execute(int sender, std::vector<std::string> args);
+	virtual CommandResult execute(int sender, std::vector<std::string> args);
 
 private:
-	GameSet& info;
+	GameSet *games;
 };
 
 #endif /* DEBUGCOMMAND_H_ */

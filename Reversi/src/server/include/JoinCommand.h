@@ -15,13 +15,13 @@
 
 class JoinCommand: public Command {
 public:
-	JoinCommand(GameSet& info);
+	JoinCommand();
 	virtual ~JoinCommand();
 
-	virtual void execute(int sender, std::vector<std::string> args);
+	virtual CommandResult execute(int sender, std::vector<std::string> args);
 
 private:
-	GameSet& info;
+	GameSet *games;
 };
 
 #endif /* JOINCOMMAND_H_ */

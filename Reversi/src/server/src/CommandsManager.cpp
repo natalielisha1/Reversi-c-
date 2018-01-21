@@ -8,6 +8,38 @@
 
 using namespace std;
 
+CommandsManager *CommandsManager::theInstance = NULL;
+pthread_mutex_t CommandsManager::lock = PTHREAD_MUTEX_INITIALIZER;
+
+void CommandsManager::initialize() {
+	pthread_mutex_init(&lock, NULL);
+	GameSet::initialize();
+}
+
+CommandsManager *CommandsManager::getInstance() {
+	if (theInstance == NULL) {
+		pthread_mutex_lock(&lock);
+		if (theInstance == NULL) {
+			theInstance = new CommandsManager();
+		}
+		pthread_mutex_unlock(&lock);
+	}
+	return theInstance;
+}
+
+void CommandsManager::deleteInstance() {
+	if (theInstance != NULL) {
+		pthread_mutex_lock(&lock);
+		if (theInstance != NULL) {
+			delete theInstance;
+			theInstance = NULL;
+		}
+		pthread_mutex_unlock(&lock);
+	}
+
+	GameSet::deleteInstance();
+}
+
 /***************************************
  * Function Name: CommandsManager (Constructor)
  * The Input: a reference to a game set object
@@ -15,13 +47,13 @@ using namespace std;
  * The Function Operation: initializing the commands
  * manager object
  **************************************/
-CommandsManager::CommandsManager(GameSet& info) {
-	commandsMap["debug"] = new DebugCommand(info);
-	commandsMap["start"] = new StartMatchCommand(info);
-	commandsMap["list_games"] = new ListGamesCommand(info);
-	commandsMap["join"] = new JoinCommand(info);
-	commandsMap["play"] = new PlayCommand(info);
-	commandsMap["close"] = new CloseCommand(info);
+CommandsManager::CommandsManager() {
+	commandsMap["debug"] = new DebugCommand();
+	commandsMap["start"] = new StartMatchCommand();
+	commandsMap["list_games"] = new ListGamesCommand();
+	commandsMap["join"] = new JoinCommand();
+	commandsMap["play"] = new PlayCommand();
+	commandsMap["close"] = new CloseCommand();
 }
 
 /***************************************
@@ -48,7 +80,7 @@ CommandsManager::~CommandsManager() {
  * The Function Operation: executing the
  * given command
  **************************************/
-void CommandsManager::executeCommand(int sender, string command, vector<string> args) {
+CommandResult CommandsManager::executeCommand(int sender, string command, vector<string> args) {
 	Command *currCommand = commandsMap[command];
-	currCommand->execute(sender, args);
+	return currCommand->execute(sender, args);
 }

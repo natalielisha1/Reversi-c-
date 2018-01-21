@@ -8,6 +8,35 @@
 
 using namespace std;
 
+GameSet *GameSet::theInstance = NULL;
+pthread_mutex_t GameSet::lock = PTHREAD_MUTEX_INITIALIZER;
+
+void GameSet::initialize() {
+	pthread_mutex_init(&lock, NULL);
+}
+
+GameSet *GameSet::getInstance() {
+	if (theInstance == NULL) {
+		pthread_mutex_lock(&lock);
+		if (theInstance == NULL) {
+			theInstance = new GameSet();
+		}
+		pthread_mutex_unlock(&lock);
+	}
+	return theInstance;
+}
+
+void GameSet::deleteInstance() {
+	if (theInstance != NULL) {
+		pthread_mutex_lock(&lock);
+		if (theInstance != NULL) {
+			delete theInstance;
+			theInstance = NULL;
+		}
+		pthread_mutex_unlock(&lock);
+	}
+}
+
 /***************************************
  * Function Name: GameSet
  * The Input: no input
@@ -15,7 +44,8 @@ using namespace std;
  * The Function Operation: initializing
  * the game set
  **************************************/
-GameSet::GameSet(): lastCommand(GameSet::Debug), lastCommandResult(-1) {
+GameSet::GameSet(): lastCommand(CommandResult::None),
+					lastCommandResult(-1){
 	//Regular messages init
 	firstPlayerMessage = string("1");
 	secondPlayerMessage = string("2");
@@ -33,6 +63,7 @@ GameSet::GameSet(): lastCommand(GameSet::Debug), lastCommandResult(-1) {
 	pthread_mutex_init(&matchesMutex, NULL);
 	pthread_mutex_init(&clientMapMutex, NULL);
 	pthread_mutex_init(&stringsMutex, NULL);
+	pthread_mutex_init(&lastCommandMutex, NULL);
 }
 
 /***************************************
@@ -58,24 +89,29 @@ GameSet::~GameSet() {
  * 			   info to the
  *			   client
  **************************************/
-void GameSet::debugMessage(int clientSocket, vector<string> args) {
+CommandResult GameSet::debugMessage(int clientSocket, vector<string> args) {
 	string toSend = "";
 	char *toStringResult;
 	if (args.size() == 0) {
 		toSend.append("Last Command: ");
+		pthread_mutex_lock(&lastCommandMutex);
 		toStringResult = myToString(lastCommand);
 		toSend.append(toStringResult);
 		delete[] toStringResult;
 		toSend.append("\n");
 		toSend.append("Last Result: ");
 		toStringResult = myToString(lastCommandResult);
+		pthread_mutex_unlock(&lastCommandMutex);
 		toSend.append(toStringResult);
 		delete[] toStringResult;
 		toSend.append("\n");
 		sendMessageToClient(clientSocket, toSend);
-		lastCommand = GameSet::Debug;
+		pthread_mutex_lock(&lastCommandMutex);
+		lastCommand = CommandResult::Debug;
 		lastCommandResult = NO_ERROR_RESULT;
-		return;
+		CommandResult toReturn = CommandResult(true, lastCommand, lastCommandResult);
+		pthread_mutex_unlock(&lastCommandMutex);
+		return toReturn;
 	} else {
 		if (args[0] == "find" && args.size() >= 2) {
 			for (vector<GameInfo *>::iterator it = matches.begin(); it != matches.end(); ++it) {
@@ -96,22 +132,32 @@ void GameSet::debugMessage(int clientSocket, vector<string> args) {
 					toStringResult = myToString((*it)->getClientB());
 					toSend.append(toStringResult);
 					sendMessageToClient(clientSocket, toSend);
-					lastCommand = GameSet::Debug;
+					pthread_mutex_lock(&lastCommandMutex);
+					lastCommand = CommandResult::Debug;
 					lastCommandResult = NO_ERROR_RESULT;
-					return;
+					CommandResult toReturn = CommandResult(true, lastCommand, lastCommandResult);
+					pthread_mutex_unlock(&lastCommandMutex);
+					return toReturn;
 				}
 			}
 			toSend.append("Game wasn't found");
 			sendMessageToClient(clientSocket, toSend);
-			lastCommand = GameSet::Debug;
+			pthread_mutex_lock(&lastCommandMutex);
+			lastCommand = CommandResult::Debug;
 			lastCommandResult = ERROR_GAME_DOES_NOT_EXIST_RESULT;
-			return;
+			CommandResult toReturn = CommandResult(true, lastCommand, lastCommandResult);
+			pthread_mutex_unlock(&lastCommandMutex);
+			return toReturn;
 		}
 	}
 	toSend.append("Invalid args");
 	sendMessageToClient(clientSocket, toSend);
-	lastCommand = GameSet::Debug;
+	pthread_mutex_lock(&lastCommandMutex);
+	lastCommand = CommandResult::Debug;
 	lastCommandResult = ERROR_NO_ARGS_RESULT;
+	CommandResult toReturn = CommandResult(true, lastCommand, lastCommandResult);
+	pthread_mutex_unlock(&lastCommandMutex);
+	return toReturn;
 }
 
 /***************************************
@@ -122,15 +168,24 @@ void GameSet::debugMessage(int clientSocket, vector<string> args) {
  * The Output: no output
  * The Function Operation: starting a new match
  **************************************/
-void GameSet::startNewMatch(int clientASocket, vector<string> args) {
-	lastCommand = GameSet::Start;
+CommandResult GameSet::startNewMatch(int clientASocket, vector<string> args) {
+	pthread_mutex_lock(&lastCommandMutex);
+	lastCommand = CommandResult::Start;
+	pthread_mutex_unlock(&lastCommandMutex);
 
 	if (args.size() < 1) {
+		pthread_mutex_lock(&lastCommandMutex);
 		lastCommandResult = ERROR_NO_ARGS_RESULT;
+		pthread_mutex_unlock(&lastCommandMutex);
+
 		pthread_mutex_lock(&stringsMutex);
 		sendMessageToClient(clientASocket, noArgsErrorMessage);
 		pthread_mutex_unlock(&stringsMutex);
-		return;
+
+		pthread_mutex_lock(&lastCommandMutex);
+		CommandResult toReturn = CommandResult(true, CommandResult::Start, ERROR_NO_ARGS_RESULT);
+		pthread_mutex_unlock(&lastCommandMutex);
+		return toReturn;
 	}
 
 	GameInfo *newGame;
@@ -138,12 +193,19 @@ void GameSet::startNewMatch(int clientASocket, vector<string> args) {
 	pthread_mutex_lock(&matchesMutex);
 	for (vector<GameInfo *>::iterator it = matches.begin(); it != matches.end(); ++it) {
 		if ((*it)->getGameName() == args[0]) {
+			pthread_mutex_lock(&lastCommandMutex);
 			lastCommandResult = ERROR_GAME_EXISTS_RESULT;
+			pthread_mutex_unlock(&lastCommandMutex);
+
 			pthread_mutex_lock(&stringsMutex);
 			sendMessageToClient(clientASocket, gameExistsErrorMessage);
 			pthread_mutex_unlock(&stringsMutex);
 			pthread_mutex_unlock(&matchesMutex);
-			return;
+
+			pthread_mutex_lock(&lastCommandMutex);
+			CommandResult toReturn = CommandResult(true, CommandResult::Start, ERROR_GAME_EXISTS_RESULT);
+			pthread_mutex_unlock(&lastCommandMutex);
+			return toReturn;
 		}
 	}
 	pthread_mutex_unlock(&matchesMutex);
@@ -162,10 +224,18 @@ void GameSet::startNewMatch(int clientASocket, vector<string> args) {
 	matchClientMap[clientASocket] = newGame;
 	pthread_mutex_unlock(&clientMapMutex);
 
+	pthread_mutex_lock(&lastCommandMutex);
 	lastCommandResult = NO_ERROR_RESULT;
+	pthread_mutex_unlock(&lastCommandMutex);
+
 	pthread_mutex_lock(&stringsMutex);
 	sendMessageToClient(clientASocket, noErrorMessage);
 	pthread_mutex_unlock(&stringsMutex);
+
+	pthread_mutex_lock(&lastCommandMutex);
+	CommandResult toReturn = CommandResult(true, CommandResult::Start, NO_ERROR_RESULT);
+	pthread_mutex_unlock(&lastCommandMutex);
+	return toReturn;
 }
 
 /***************************************
@@ -177,25 +247,41 @@ void GameSet::startNewMatch(int clientASocket, vector<string> args) {
  * The Function Operation: adding a new client
  * to the match
  **************************************/
-void GameSet::joinMatch(int clientBSocket, vector<string> args) {
-	lastCommand = GameSet::Join;
+CommandResult GameSet::joinMatch(int clientBSocket, vector<string> args) {
+	pthread_mutex_lock(&lastCommandMutex);
+	lastCommand = CommandResult::Join;
+	pthread_mutex_unlock(&lastCommandMutex);
 
 	if (args.size() < 1) {
+		pthread_mutex_lock(&lastCommandMutex);
 		lastCommandResult = ERROR_NO_ARGS_RESULT;
-		return;
+		CommandResult toReturn = CommandResult(true, CommandResult::Join, lastCommandResult);
+		pthread_mutex_unlock(&lastCommandMutex);
+		return toReturn;
 	}
 	pthread_mutex_lock(&matchesMutex);
 	for (vector<GameInfo *>::iterator it = matches.begin(); it != matches.end(); ++it) {
 		if ((*it)->getGameName() == args[0]) {
 			if ((*it)->getStatus() != GameInfo::XWaiting) {
+				pthread_mutex_lock(&lastCommandMutex);
 				lastCommandResult = ERROR_GAME_FULL_RESULT;
+				pthread_mutex_unlock(&lastCommandMutex);
+
 				pthread_mutex_lock(&stringsMutex);
 				sendMessageToClient(clientBSocket, gameFullErrorMessage);
 				pthread_mutex_unlock(&stringsMutex);
+
 				pthread_mutex_unlock(&matchesMutex);
-				return;
+
+				pthread_mutex_lock(&lastCommandMutex);
+				CommandResult toReturn = CommandResult(true, CommandResult::Join, ERROR_GAME_FULL_RESULT);
+				pthread_mutex_unlock(&lastCommandMutex);
+				return toReturn;
 			} else {
+				pthread_mutex_lock(&lastCommandMutex);
 				lastCommandResult = NO_ERROR_RESULT;
+				pthread_mutex_unlock(&lastCommandMutex);
+
 				int clientASocket = (*it)->getClientA();
 				matchClientMap[clientBSocket] = *it;
 				(*it)->setClientB(clientBSocket);
@@ -206,15 +292,28 @@ void GameSet::joinMatch(int clientBSocket, vector<string> args) {
 				sendMessageToClient(clientBSocket, secondPlayerMessage);
 				pthread_mutex_unlock(&stringsMutex);
 				pthread_mutex_unlock(&matchesMutex);
-				return;
+
+				pthread_mutex_lock(&lastCommandMutex);
+				CommandResult toReturn = CommandResult(true, CommandResult::Join, NO_ERROR_RESULT);
+				pthread_mutex_unlock(&lastCommandMutex);
+				return toReturn;
 			}
 		}
 	}
 	pthread_mutex_unlock(&matchesMutex);
+
+	pthread_mutex_lock(&lastCommandMutex);
 	lastCommandResult = ERROR_GAME_DOES_NOT_EXIST_RESULT;
+	pthread_mutex_unlock(&lastCommandMutex);
+
 	pthread_mutex_lock(&stringsMutex);
 	sendMessageToClient(clientBSocket, gameDoesNotExistErrorMessage);
 	pthread_mutex_unlock(&stringsMutex);
+
+	pthread_mutex_lock(&lastCommandMutex);
+	CommandResult toReturn = CommandResult(true, CommandResult::Join, ERROR_GAME_DOES_NOT_EXIST_RESULT);
+	pthread_mutex_unlock(&lastCommandMutex);
+	return toReturn;
 }
 
 /***************************************
@@ -227,8 +326,10 @@ void GameSet::joinMatch(int clientBSocket, vector<string> args) {
  * The Function Operation: playing the match
  * using the location of the intended move
  **************************************/
-void GameSet::playMatch(int senderClient, string xLoc, string yLoc) {
-	lastCommand = GameSet::Play;
+CommandResult GameSet::playMatch(int senderClient, string xLoc, string yLoc) {
+	pthread_mutex_lock(&lastCommandMutex);
+	lastCommand = CommandResult::Play;
+	pthread_mutex_unlock(&lastCommandMutex);
 
 	string toSend = string(xLoc);
 	toSend.append(", ");
@@ -236,16 +337,27 @@ void GameSet::playMatch(int senderClient, string xLoc, string yLoc) {
 
 	GameInfo *currGame = getGameInfo(senderClient);
 	if (currGame == NULL) {
+		pthread_mutex_lock(&lastCommandMutex);
 		lastCommandResult = ERROR_INVALID_CLIENT_RESULT;
-		return;
+		CommandResult toReturn = CommandResult(true, CommandResult::Play, lastCommandResult);
+		pthread_mutex_unlock(&lastCommandMutex);
+		return toReturn;
 	}
 	if (currGame->getStatus() != GameInfo::Playing) {
+		pthread_mutex_lock(&lastCommandMutex);
 		lastCommandResult = ERROR_GAME_NOT_PLAYING_RESULT;
-		return;
+		CommandResult toReturn = CommandResult(true, CommandResult::Play, lastCommandResult);
+		pthread_mutex_unlock(&lastCommandMutex);
+		return toReturn;
 	}
 	int otherClient = currGame->getOtherClient(senderClient);
 	sendMessageToClient(otherClient, toSend);
+
+	pthread_mutex_lock(&lastCommandMutex);
 	lastCommandResult = NO_ERROR_RESULT;
+	CommandResult toReturn = CommandResult(true, CommandResult::Play, lastCommandResult);
+	pthread_mutex_unlock(&lastCommandMutex);
+	return toReturn;
 }
 
 /***************************************
@@ -258,25 +370,41 @@ void GameSet::playMatch(int senderClient, string xLoc, string yLoc) {
  * if there's indeed no move and send an error
  * and/or a message accordingly
  **************************************/
-void GameSet::playMatch(int senderClient, string noMove) {
-	lastCommand = GameSet::Play;
+CommandResult GameSet::playMatch(int senderClient, string noMove) {
+	pthread_mutex_lock(&lastCommandMutex);
+	lastCommand = CommandResult::Play;
+	pthread_mutex_unlock(&lastCommandMutex);
 
 	string toCompare = "NoMove";
 	GameInfo *currGame = getGameInfo(senderClient);
 	if (currGame == NULL) {
+		pthread_mutex_lock(&lastCommandMutex);
 		lastCommandResult = ERROR_INVALID_CLIENT_RESULT;
-		return;
+		CommandResult toReturn = CommandResult(true, CommandResult::Play, lastCommandResult);
+		pthread_mutex_unlock(&lastCommandMutex);
+		return toReturn;
 	}
 	if (currGame->getStatus() != GameInfo::Playing) {
+		pthread_mutex_lock(&lastCommandMutex);
 		lastCommandResult = ERROR_GAME_NOT_PLAYING_RESULT;
-		return;
+		CommandResult toReturn = CommandResult(true, CommandResult::Play, lastCommandResult);
+		pthread_mutex_unlock(&lastCommandMutex);
+		return toReturn;
 	}
 	if (noMove == toCompare) {
 		int otherClient = currGame->getOtherClient(senderClient);
 		sendMessageToClient(otherClient, noMove);
+		pthread_mutex_lock(&lastCommandMutex);
 		lastCommandResult = NO_ERROR_RESULT;
+		CommandResult toReturn = CommandResult(true, CommandResult::Play, lastCommandResult);
+		pthread_mutex_unlock(&lastCommandMutex);
+		return toReturn;
 	} else {
+		pthread_mutex_lock(&lastCommandMutex);
 		lastCommandResult = ERROR_FAKE_NO_MOVE_RESULT;
+		CommandResult toReturn = CommandResult(true, CommandResult::Play, lastCommandResult);
+		pthread_mutex_unlock(&lastCommandMutex);
+		return toReturn;
 	}
 }
 
@@ -287,12 +415,17 @@ void GameSet::playMatch(int senderClient, string noMove) {
  * The Output: no output
  * The Function Operation: closing the match
  **************************************/
-void GameSet::closeMatch(int senderClient, vector<string> args) {
-	lastCommand = GameSet::Close;
+CommandResult GameSet::closeMatch(int senderClient, vector<string> args) {
+	pthread_mutex_lock(&lastCommandMutex);
+	lastCommand = CommandResult::Close;
+	pthread_mutex_unlock(&lastCommandMutex);
 
 	if (args.size() < 1) {
+		pthread_mutex_lock(&lastCommandMutex);
 		lastCommandResult = ERROR_NO_ARGS_RESULT;
-		return;
+		CommandResult toReturn = CommandResult(true, CommandResult::Close, lastCommandResult);
+		pthread_mutex_unlock(&lastCommandMutex);
+		return toReturn;
 	}
 	pthread_mutex_lock(&matchesMutex);
 	for (vector<GameInfo *>::iterator it = matches.begin(); it != matches.end(); ++it) {
@@ -311,13 +444,22 @@ void GameSet::closeMatch(int senderClient, vector<string> args) {
 			close(toClose->getClientB());
 			//matches.erase(it);
 			//delete toClose;
-			lastCommandResult = NO_ERROR_RESULT;
 			pthread_mutex_unlock(&matchesMutex);
-			return;
+
+			pthread_mutex_lock(&lastCommandMutex);
+			lastCommandResult = NO_ERROR_RESULT;
+			CommandResult toReturn = CommandResult(true, CommandResult::Close, lastCommandResult);
+			pthread_mutex_unlock(&lastCommandMutex);
+			return toReturn;
 		}
 	}
 	pthread_mutex_unlock(&matchesMutex);
+
+	pthread_mutex_lock(&lastCommandMutex);
 	lastCommandResult = ERROR_GAME_DOES_NOT_EXIST_RESULT;
+	CommandResult toReturn = CommandResult(true, CommandResult::Close, lastCommandResult);
+	pthread_mutex_unlock(&lastCommandMutex);
+	return toReturn;
 }
 
 /***************************************
@@ -327,8 +469,11 @@ void GameSet::closeMatch(int senderClient, vector<string> args) {
  * The Function Operation: listing the names of
  * the matches that played
  **************************************/
-void GameSet::listMatches(int senderClient) {
-	lastCommand = GameSet::List;
+CommandResult GameSet::listMatches(int senderClient) {
+	pthread_mutex_lock(&lastCommandMutex);
+	lastCommand = CommandResult::List;
+	pthread_mutex_unlock(&lastCommandMutex);
+
 	string toSend = "";
 	pthread_mutex_lock(&matchesMutex);
 	for (vector<GameInfo *>::iterator it = matches.begin(); it != matches.end(); ++it) {
@@ -344,7 +489,12 @@ void GameSet::listMatches(int senderClient) {
 		toSend = noGamesAvailableMessage;
 	}
 	sendMessageToClient(senderClient, toSend);
+
+	pthread_mutex_lock(&lastCommandMutex);
 	lastCommandResult = NO_ERROR_RESULT;
+	CommandResult toReturn = CommandResult(true, CommandResult::List, lastCommandResult);
+	pthread_mutex_unlock(&lastCommandMutex);
+	return toReturn;
 }
 
 /***************************************
@@ -431,7 +581,7 @@ bool GameSet::sendMessageToClient(int client, string& msg) {
  * The Function Operation: getting
  * the last command sent to the server
  **************************************/
-GameSet::CommandOption GameSet::getLastCommand() const {
+CommandResult::CommandOption GameSet::getLastCommand() const {
 	return lastCommand;
 }
 

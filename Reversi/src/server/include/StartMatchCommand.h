@@ -15,13 +15,13 @@
 
 class StartMatchCommand: public Command {
 public:
-	StartMatchCommand(GameSet& info);
+	StartMatchCommand();
 	virtual ~StartMatchCommand();
 
-	virtual void execute(int sender, std::vector<std::string> args);
+	virtual CommandResult execute(int sender, std::vector<std::string> args);
 
 private:
-	GameSet& info;
+	GameSet *games;
 };
 
 #endif /* STARTMATCHCOMMAND_H_ */
