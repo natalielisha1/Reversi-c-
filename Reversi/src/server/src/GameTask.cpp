@@ -1,9 +1,8 @@
-/*
- * GameTask.cpp
- *
- *  Created on: Jan 17, 2018
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex7
+ **************************************/
 
 #include "GameTask.h"
 #include "Server.h"
