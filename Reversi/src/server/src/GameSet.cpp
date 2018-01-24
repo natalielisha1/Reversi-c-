@@ -539,8 +539,8 @@ bool GameSet::removeGame(GameInfo *currGame) {
 			matchClientMap.erase(clientB);
 			pthread_mutex_unlock(&clientMapMutex);
 
-			close(clientA);
-			close(clientB);
+			//close(clientA);
+			//close(clientB);
 		}
 
 		pthread_mutex_lock(&matchesMutex);

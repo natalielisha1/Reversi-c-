@@ -19,6 +19,7 @@
 #include "VerboseController.h"
 #include "CommandsManager.h"
 #include "ToolsForStrings.h"
+#include "ExitController.h"
 
 #define BUFFER_SIZE 2000
 

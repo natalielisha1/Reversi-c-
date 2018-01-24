@@ -18,6 +18,7 @@ CommandResult Task::handleCommand(int client) {
 	//Cout mutex & verbose status
 	VerboseController *verbose = VerboseController::getInstance();
 	CommandsManager *cmdManager = CommandsManager::getInstance();
+	ExitController *exitController = ExitController::getInstance();
 
 	//Creating a buffer
 	char buffer[BUFFER_SIZE] = {0};
@@ -29,6 +30,9 @@ CommandResult Task::handleCommand(int client) {
 		//Reading the message
 		readSize = recv(client, buffer, BUFFER_SIZE, RECV_FLAGS);
 		while (readSize == -1) {
+			if (exitController->getExit() == true) {
+				return CommandResult(false);
+			}
 			//Re-reading the message (timeout)
 			readSize = recv(client, buffer, BUFFER_SIZE, RECV_FLAGS);
 		}
@@ -37,7 +41,7 @@ CommandResult Task::handleCommand(int client) {
 			verbose->lockCout();
 			cout << "Client " << client << " disconnected" << endl;
 			verbose->unlockCout();
-			return false;
+			return CommandResult(false);
 		}
 
 		msg.append(buffer);

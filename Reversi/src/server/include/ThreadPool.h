@@ -29,6 +29,7 @@ public:
 	void addTask(Task *task);
 	void terminate();
 
+	bool getExit() const;
 private:
 	static ThreadPool *theInstance;
 	static pthread_mutex_t lock;

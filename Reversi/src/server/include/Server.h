@@ -79,8 +79,10 @@ private:
 
 	VerboseController *verbose;
 
-	bool serverExit;
-	pthread_mutex_t serverExitMutex;
+	ExitController *exitController;
+
+	//bool serverExit;
+	//pthread_mutex_t serverExitMutex;
 
 	void addThread(int client);
 
@@ -89,7 +91,7 @@ private:
 	bool handleCommand(int client);
 
 	bool getExit();
-	void setExit(bool exit);
+	void setExit();
 };
 
 //Outsider Functions

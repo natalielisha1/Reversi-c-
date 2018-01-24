@@ -18,11 +18,7 @@ void *exitThreadMain(void *arg);
  * The Function Operation: initializing
  *  the server from config file
  **************************************/
-Server::Server(): serverSocket(0),
-				  //cmdManager(games),
-				  //lastUsedGame(NULL),
-				  //lastUsedClient(-1),
-				  serverExit(false) {
+Server::Server(): serverSocket(0) {
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
 	if (!serverConfig.is_open()) {
@@ -32,11 +28,6 @@ Server::Server(): serverSocket(0),
 	serverConfig >> port;
 	//Closing the file
 	serverConfig.close();
-	//pthread_mutex_init(&gamesMutex, NULL);
-	//pthread_mutex_init(&verboseMutex, NULL);
-	//pthread_mutex_init(&lastGameMutex, NULL);
-	//pthread_mutex_init(&lastClientMutex, NULL);
-	pthread_mutex_init(&serverExitMutex, NULL);
 
 	VerboseController::initialize();
 	this->verbose = VerboseController::getInstance(false);
@@ -46,6 +37,9 @@ Server::Server(): serverSocket(0),
 
 	ThreadPool::initialize();
 	this->threadPool = ThreadPool::getInstance(MAX_THREADS);
+
+	ExitController::initialize();
+	this->exitController = ExitController::getInstance();
 }
 
 /***************************************
@@ -55,11 +49,7 @@ Server::Server(): serverSocket(0),
  * The Function Operation: initializing
  *  the server from config file
  **************************************/
-Server::Server(bool verbose): serverSocket(0),
-							  //cmdManager(games),
-							  //lastUsedGame(NULL),
-							  //lastUsedClient(-1),
-							  serverExit(false){
+Server::Server(bool verbose): serverSocket(0){
 	//Reading the config file and applying the config
 	ifstream serverConfig("server_port.txt");
 	if (!serverConfig.is_open()) {
@@ -69,11 +59,6 @@ Server::Server(bool verbose): serverSocket(0),
 	serverConfig >> port;
 	//Closing the file
 	serverConfig.close();
-	//pthread_mutex_init(&gamesMutex, NULL);
-	//pthread_mutex_init(&verboseMutex, NULL);
-	//pthread_mutex_init(&lastGameMutex, NULL);
-	//pthread_mutex_init(&lastClientMutex, NULL);
-	pthread_mutex_init(&serverExitMutex, NULL);
 
 	VerboseController::initialize();
 	this->verbose = VerboseController::getInstance(verbose);
@@ -83,6 +68,9 @@ Server::Server(bool verbose): serverSocket(0),
 
 	ThreadPool::initialize();
 	this->threadPool = ThreadPool::getInstance(MAX_THREADS);
+
+	ExitController::initialize();
+	this->exitController = ExitController::getInstance();
 }
 
 /***************************************
@@ -92,16 +80,7 @@ Server::Server(bool verbose): serverSocket(0),
  * The Function Operation: initializing
  *  the server from port input
  **************************************/
-Server::Server(int port): port(port), serverSocket(0),
-						  //cmdManager(games),
-						  //lastUsedGame(NULL),
-						  //lastUsedClient(-1),
-						  serverExit(false){
-	//pthread_mutex_init(&gamesMutex, NULL);
-	//pthread_mutex_init(&verboseMutex, NULL);
-	//pthread_mutex_init(&lastGameMutex, NULL);
-	//pthread_mutex_init(&lastClientMutex, NULL);
-	pthread_mutex_init(&serverExitMutex, NULL);
+Server::Server(int port): port(port), serverSocket(0){
 
 	VerboseController::initialize();
 	this->verbose = VerboseController::getInstance(false);
@@ -111,6 +90,9 @@ Server::Server(int port): port(port), serverSocket(0),
 
 	ThreadPool::initialize();
 	this->threadPool = ThreadPool::getInstance(MAX_THREADS);
+
+	ExitController::initialize();
+	this->exitController = ExitController::getInstance();
 }
 
 /***************************************
@@ -120,16 +102,7 @@ Server::Server(int port): port(port), serverSocket(0),
  * The Function Operation: initializing
  *  the server from port input
  **************************************/
-Server::Server(int port, bool verbose): port(port), serverSocket(0),
-										//cmdManager(games),
-										//lastUsedGame(NULL),
-										//lastUsedClient(-1),
-										serverExit(false){
-	//pthread_mutex_init(&gamesMutex, NULL);
-	//pthread_mutex_init(&verboseMutex, NULL);
-	//pthread_mutex_init(&lastGameMutex, NULL);
-	//pthread_mutex_init(&lastClientMutex, NULL);
-	pthread_mutex_init(&serverExitMutex, NULL);
+Server::Server(int port, bool verbose): port(port), serverSocket(0){
 
 	VerboseController::initialize();
 	this->verbose = VerboseController::getInstance(verbose);
@@ -139,6 +112,9 @@ Server::Server(int port, bool verbose): port(port), serverSocket(0),
 
 	ThreadPool::initialize();
 	this->threadPool = ThreadPool::getInstance(MAX_THREADS);
+
+	ExitController::initialize();
+	this->exitController = ExitController::getInstance();
 }
 
 /***************************************
@@ -157,6 +133,7 @@ Server::~Server() {
 //	}
 	VerboseController::deleteInstance();
 	CommandsManager::deleteInstance();
+	ExitController::deleteInstance();
 
 	cout << "All done. All communications are closed!" << endl;
 }
@@ -420,10 +397,11 @@ bool Server::getVerbose() {
  * value of the exit boolean member
  **************************************/
 bool Server::getExit() {
-	pthread_mutex_lock(&serverExitMutex);
-	bool toReturn = serverExit;
-	pthread_mutex_unlock(&serverExitMutex);
-	return toReturn;
+//	pthread_mutex_lock(&serverExitMutex);
+//	bool toReturn = serverExit;
+//	pthread_mutex_unlock(&serverExitMutex);
+//	return toReturn;
+	return exitController->getExit();
 }
 
 /***************************************
@@ -433,13 +411,9 @@ bool Server::getExit() {
  * The Function Operation: updating the
  * value of the exit boolean member
  **************************************/
-void Server::setExit(bool exit) {
-	pthread_mutex_lock(&serverExitMutex);
-	serverExit = exit;
-	pthread_mutex_unlock(&serverExitMutex);
-	if (exit) {
-		threadPool->terminate();
-	}
+void Server::setExit() {
+	exitController->setExit();
+	threadPool->terminate();
 }
 
 //Outsider Functions
@@ -564,7 +538,7 @@ void *exitThreadMain(void *arg) {
 	while (input != toCompare) {
 		cin >> input;
 	}
-	theServer->setExit(true);
+	theServer->setExit();
 	theServer->verbose->lockCout();
 	cout << "Closing all communications, please wait." << endl;
 	cout << "It may take up to " << SOCKET_TIMEOUT << " seconds" << endl;

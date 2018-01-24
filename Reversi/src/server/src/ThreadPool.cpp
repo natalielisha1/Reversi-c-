@@ -48,11 +48,11 @@ void ThreadPool::deleteInstance() {
 
 ThreadPool::ThreadPool(int threadNum): stopped(false),
 									   threadNum(threadNum){
+	pthread_mutex_init(&queueLock, NULL);
 	threads = new pthread_t[threadNum];
 	for (int i = 0; i < threadNum; i++) {
 		pthread_create(&(threads[i]), NULL, execute, this);
 	}
-	pthread_mutex_init(&queueLock, NULL);
 }
 
 void ThreadPool::addTask(Task* task) {
@@ -65,6 +65,10 @@ void ThreadPool::terminate() {
 	stopped = true;
 	GameSet *games = GameSet::getInstance();
 	games->interruptMatches();
+}
+
+bool ThreadPool::getExit() const {
+	return stopped;
 }
 
 ThreadPool::~ThreadPool() {
