@@ -15,20 +15,22 @@
  * of the client's communication thread
  **************************************/
 void *clientCommunicationThreadMain(void *arg) {
-	//Server *theServer = (Server *) arg;
+	//Getting the client's file descriptor
 	long socketAsLong = (long) arg;
 	int currClientSocket = (int) socketAsLong;
+
+	//Var to hold the command result
 	CommandResult result;
+
+	//Getting the thread pool to send the new task
 	ThreadPool *threadPool = ThreadPool::getInstance();
+
+	//Getting the game set to send the new game
 	GameSet *games = GameSet::getInstance();
 
 	//Handling the requests
 	bool ok = true;
 	while (ok) {
-//		if (theServer->getExit()) {
-//			close(currClientSocket);
-//			return NULL;
-//		}
 		result = Task::handleCommand(currClientSocket);
 		ok = result.getStatus();
 		if (!ok || (result.getCommand() == CommandResult::Start &&
@@ -38,13 +40,8 @@ void *clientCommunicationThreadMain(void *arg) {
 				   result.getResult() == NO_ERROR_RESULT) {
 			GameInfo *currGame = games->getGameInfo(currClientSocket);
 			threadPool->addTask(new GameTask((void *) currGame));
-//			theServer->addThread(currClientSocket);
 			ok = false;
 		}
-//		} else if (theServer->getExit()) {
-//			ok = false;
-//			close(currClientSocket);
-//		}
 	}
 
 	return NULL;

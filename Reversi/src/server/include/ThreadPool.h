@@ -1,9 +1,8 @@
-/*
- * ThreadPool.h
- *
- *  Created on: Jan 17, 2018
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex7
+ **************************************/
 
 #ifndef THREADPOOL_H_
 #define THREADPOOL_H_
@@ -15,7 +14,7 @@
 #include "Task.h"
 #include "GameSet.h"
 
-#define DEFAULT_THREAD_NUM 10
+#define DEFAULT_THREAD_NUM 5
 
 class ThreadPool {
 public:

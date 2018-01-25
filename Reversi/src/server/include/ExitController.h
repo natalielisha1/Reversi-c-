@@ -1,9 +1,8 @@
-/*
- * ExitController.h
- *
- *  Created on: Jan 24, 2018
- *      Author: ofek286
- */
+/***************************************
+ * Student Name: Ofek Segal and Natalie Elisha
+ * Student ID: 315638288, 209475458
+ * Exercise Name: Ex7
+ **************************************/
 
 #ifndef EXITCONTROLLER_H_
 #define EXITCONTROLLER_H_

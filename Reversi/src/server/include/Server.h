@@ -30,7 +30,7 @@
 #include "ClientRequestsTask.h"
 
 #define MAX_CONNECTED_CLIENTS 10
-#define MAX_THREADS 10
+#define MAX_THREADS 5
 
 #define SEND_FLAGS 0
 
@@ -53,36 +53,19 @@ public:
 	friend void *clientCommunicationThreadMain(void *arg);
 	friend void *exitThreadMain(void *arg);
 private:
-//	pthread_mutex_t verboseMutex;
-
 	int port;
 	int serverSocket;
 	struct sockaddr_in server;
 
-	//GameSet games;
-	//pthread_mutex_t gamesMutex;
-
 	CommandsManager *cmdManager;
 
 	ThreadPool *threadPool;
-
-//	std::vector<pthread_t *> gameThreads;
-//	std::vector<pthread_t *> clientCommunicationThreads;
-
-//	GameInfo *lastUsedGame;
-//	pthread_mutex_t lastGameMutex;
-
-//	int lastUsedClient;
-//	pthread_mutex_t lastClientMutex;
 
 	std::vector<int> connectedClients;
 
 	VerboseController *verbose;
 
 	ExitController *exitController;
-
-	//bool serverExit;
-	//pthread_mutex_t serverExitMutex;
 
 	void addThread(int client);
 

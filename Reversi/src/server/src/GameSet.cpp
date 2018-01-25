@@ -106,13 +106,14 @@ GameSet::~GameSet() {
  * contains the arguments
  * The Output: no output
  * The Function Operation: sending debug
- * 			   info to the
- *			   client
+ * 			   							 info to the
+ *			   								 client
  **************************************/
 CommandResult GameSet::debugMessage(int clientSocket, vector<string> args) {
 	string toSend = "";
 	char *toStringResult;
 	if (args.size() == 0) {
+		//Sending the last command and last result
 		toSend.append("Last Command: ");
 		pthread_mutex_lock(&lastCommandMutex);
 		toStringResult = myToString(lastCommand);
@@ -127,12 +128,17 @@ CommandResult GameSet::debugMessage(int clientSocket, vector<string> args) {
 		toSend.append("\n");
 		sendMessageToClient(clientSocket, toSend);
 		pthread_mutex_lock(&lastCommandMutex);
+
+		//Updating the last command and result
 		lastCommand = CommandResult::Debug;
 		lastCommandResult = NO_ERROR_RESULT;
+
+		//Returning the result
 		CommandResult toReturn = CommandResult(true, lastCommand, lastCommandResult);
 		pthread_mutex_unlock(&lastCommandMutex);
 		return toReturn;
 	} else {
+		//Finding the game and sending info about it
 		if (args[0] == "find" && args.size() >= 2) {
 			for (vector<GameInfo *>::iterator it = matches.begin(); it != matches.end(); ++it) {
 				if ((*it)->getGameName() == args[1]) {
@@ -460,10 +466,6 @@ CommandResult GameSet::closeMatch(int senderClient, vector<string> args) {
 			matchClientMap.erase(toClose->getClientA());
 			matchClientMap.erase(toClose->getClientB());
 			pthread_mutex_unlock(&clientMapMutex);
-			close(toClose->getClientA());
-			close(toClose->getClientB());
-			//matches.erase(it);
-			//delete toClose;
 			pthread_mutex_unlock(&matchesMutex);
 
 			pthread_mutex_lock(&lastCommandMutex);
@@ -559,9 +561,6 @@ bool GameSet::removeGame(GameInfo *currGame) {
 			matchClientMap.erase(clientA);
 			matchClientMap.erase(clientB);
 			pthread_mutex_unlock(&clientMapMutex);
-
-			//close(clientA);
-			//close(clientB);
 		}
 
 		pthread_mutex_lock(&matchesMutex);

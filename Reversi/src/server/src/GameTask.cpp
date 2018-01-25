@@ -15,17 +15,22 @@
  * function of the game's thread
  **************************************/
 void *gameThreadMain(void *arg) {
-	//Server *theServer = (Server *) arg;
+	//Getting the current game from the arg
 	GameInfo *currGame = (GameInfo *) arg;
+
+	//Getting the game set
 	GameSet *games = GameSet::getInstance();
 
+	//Getting the client file descriptors
 	int firstClient = currGame->getClientA();
 	int secondClient = currGame->getClientB();
 
 	bool ok = true;
 
+	//Var to hold the command result
 	CommandResult result;
 
+	//Var to hold the current client
 	int currClient = firstClient;
 
 	while (ok) {
