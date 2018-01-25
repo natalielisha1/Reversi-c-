@@ -253,6 +253,15 @@ bool Board::put(Point point, Cell playerType) {
 	}
 }
 
+/***************************************
+ * Function Name: putClean
+ * The Input: point - a point
+ * 							playerType - the cell that
+ * 							represents the type of the player
+ * The Output: no output
+ * The Function Operation: changing the cell in
+ * the given point to the given player type
+ **************************************/
 void Board::putClean(Point point, Cell playerType) {
 	theBoard[point.getX()][point.getY()] = playerType;
 }

@@ -45,10 +45,26 @@ void *gameThreadMain(void *arg) {
 	return NULL;
 }
 
+/***************************************
+ * Function Name: GameTask
+ * The Input: a pointer of an argument
+ * The Output: a GameTask instance
+ * The Function Operation: creating and
+ * initializing a task instance using the
+ * given arguments.
+ **************************************/
 GameTask::GameTask(void *arg): Task(arg) {
 	//Nothing right now
 }
 
+/***************************************
+ * Function Name: execute
+ * The Input: no input
+ * The Output: no output
+ * The Function Operation: executing the
+ * gameThreadMain function using the given
+ * argument to the GameTask instance
+ **************************************/
 void GameTask::execute() {
 	gameThreadMain(arg);
 }

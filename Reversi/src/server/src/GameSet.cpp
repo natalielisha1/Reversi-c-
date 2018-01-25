@@ -10,10 +10,24 @@ using namespace std;
 GameSet *GameSet::theInstance = NULL;
 pthread_mutex_t GameSet::lock = PTHREAD_MUTEX_INITIALIZER;
 
+/***************************************
+ * Function Name: initialize
+ * The Input: no input
+ * The Output: no output
+ * The Function Operation: initializing
+ * the game set thread
+ **************************************/
 void GameSet::initialize() {
 	pthread_mutex_init(&lock, NULL);
 }
 
+/***************************************
+ * Function Name: getInstance
+ * The Input: no input
+ * The Output: a GameSet instance
+ * The Function Operation: returning a GameSet
+ * instance
+ **************************************/
 GameSet *GameSet::getInstance() {
 	if (theInstance == NULL) {
 		pthread_mutex_lock(&lock);
@@ -25,6 +39,13 @@ GameSet *GameSet::getInstance() {
 	return theInstance;
 }
 
+/***************************************
+ * Function Name: deleteInstance
+ * The Input: no input
+ * The Output: no output
+ * The Function Operation: deleting excisting
+ * instance
+ **************************************/
 void GameSet::deleteInstance() {
 	if (theInstance != NULL) {
 		pthread_mutex_lock(&lock);

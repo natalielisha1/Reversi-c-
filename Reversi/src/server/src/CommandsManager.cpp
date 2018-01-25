@@ -11,11 +11,25 @@ using namespace std;
 CommandsManager *CommandsManager::theInstance = NULL;
 pthread_mutex_t CommandsManager::lock = PTHREAD_MUTEX_INITIALIZER;
 
+/***************************************
+ * Function Name: initialize
+ * The Input: no input
+ * The Output: NULL
+ * The Function Operation: initializes the
+ * CommandManager thread
+ **************************************/
 void CommandsManager::initialize() {
 	pthread_mutex_init(&lock, NULL);
 	GameSet::initialize();
 }
 
+/***************************************
+ * Function Name: getInstance
+ * The Input: no input
+ * The Output: a pointer to a CommandManager instance
+ * The Function Operation: returning a
+ * pointer to a CommandManager instance
+ **************************************/
 CommandsManager *CommandsManager::getInstance() {
 	if (theInstance == NULL) {
 		pthread_mutex_lock(&lock);
@@ -27,6 +41,13 @@ CommandsManager *CommandsManager::getInstance() {
 	return theInstance;
 }
 
+/***************************************
+ * Function Name: deleteInstance
+ * The Input: no input
+ * The Output: NULL
+ * The Function Operation: deleting the
+ * CommandManager instance if exists
+ **************************************/
 void CommandsManager::deleteInstance() {
 	if (theInstance != NULL) {
 		pthread_mutex_lock(&lock);

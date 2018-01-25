@@ -50,10 +50,26 @@ void *clientCommunicationThreadMain(void *arg) {
 	return NULL;
 }
 
+/***************************************
+ * Function Name: ClientRequestsTask
+ * The Input: a pointer of an argument
+ * The Output: a ClientRequestsTask instance
+ * The Function Operation: initializing the
+ * task with the given arguments
+ **************************************/
 ClientRequestsTask::ClientRequestsTask(void *arg): Task(arg) {
 	//Nothing right now
 }
 
+/***************************************
+ * Function Name: execute
+ * The Input: no input
+ * The Output: no output
+ * The Function Operation: executing the
+ * clientCommunicationThreadMain function
+ * using the ClientRequestsTask intance's
+ * arguments
+ **************************************/
 void ClientRequestsTask::execute() {
 	clientCommunicationThreadMain(arg);
 }

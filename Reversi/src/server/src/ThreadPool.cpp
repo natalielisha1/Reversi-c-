@@ -9,10 +9,25 @@
 ThreadPool *ThreadPool::theInstance = NULL;
 pthread_mutex_t ThreadPool::lock = PTHREAD_MUTEX_INITIALIZER;
 
+/***************************************
+ * Function Name: initialize
+ * The Input: no input
+ * The Output: NULL
+ * The Function Operation: initializing the
+ * threadPool
+ **************************************/
 void ThreadPool::initialize() {
 	pthread_mutex_init(&lock, NULL);
 }
 
+/***************************************
+ * Function Name: getInstance
+ * The Input: threadNum - number of the threads in
+ * the thread pool
+ * The Output: a pointer to a ThreadPool instance
+ * The Function Operation: returning a ThreadPool
+ * instance that contains the given amount of threads
+ **************************************/
 ThreadPool *ThreadPool::getInstance(int threadNum) {
 	if (theInstance == NULL) {
 		pthread_mutex_lock(&lock);
@@ -24,6 +39,14 @@ ThreadPool *ThreadPool::getInstance(int threadNum) {
 	return theInstance;
 }
 
+/***************************************
+ * Function Name: getInstance
+ * The Input: no input
+ * the thread pool
+ * The Output: a pointer to a ThreadPool instance
+ * The Function Operation: returning a ThreadPool
+ * instance
+ **************************************/
 ThreadPool *ThreadPool::getInstance() {
 	if (theInstance == NULL) {
 		pthread_mutex_lock(&lock);
@@ -35,6 +58,13 @@ ThreadPool *ThreadPool::getInstance() {
 	return theInstance;
 }
 
+/***************************************
+ * Function Name: getInstance
+ * The Input: no input
+ * The Output: NULL
+ * The Function Operation: deleting the ThreadPool
+ * instance if exists
+ **************************************/
 void ThreadPool::deleteInstance() {
 	if (theInstance != NULL) {
 		pthread_mutex_lock(&lock);
@@ -46,6 +76,14 @@ void ThreadPool::deleteInstance() {
 	}
 }
 
+/***************************************
+ * Function Name: ThreadPool
+ * The Input: threadNum - number of the threads in
+ * the thread pool
+ * The Output: a ThreadPool instance
+ * The Function Operation: constructor of ThreadPool
+ * instances
+ **************************************/
 ThreadPool::ThreadPool(int threadNum): stopped(false),
 									   threadNum(threadNum){
 	pthread_mutex_init(&queueLock, NULL);
@@ -55,22 +93,48 @@ ThreadPool::ThreadPool(int threadNum): stopped(false),
 	}
 }
 
+/***************************************
+ * Function Name: addTask
+ * The Input: task - a pointer to a task instance
+ * The Output: NULL
+ * The Function Operation: adding a task to the thread pool
+ **************************************/
 void ThreadPool::addTask(Task* task) {
 	pthread_mutex_lock(&queueLock);
 	tasks.push(task);
 	pthread_mutex_unlock(&queueLock);
 }
 
+/***************************************
+ * Function Name: terminate
+ * The Input: no input
+ * The Output: NULL
+ * The Function Operation: terminates the thread pool
+ **************************************/
 void ThreadPool::terminate() {
 	stopped = true;
 	GameSet *games = GameSet::getInstance();
 	games->interruptMatches();
 }
 
+/***************************************
+ * Function Name: getExit
+ * The Input: no input
+ * The Output: boolean value, true/false
+ * The Function Operation: returning true if
+ * should exit, otherwise false.
+ **************************************/
 bool ThreadPool::getExit() const {
 	return stopped;
 }
 
+/***************************************
+ * Function Name: ~ThreadPool
+ * The Input: no input
+ * The Output: no output
+ * The Function Operation: destructor for ThreadPool
+ * instances
+ **************************************/
 ThreadPool::~ThreadPool() {
 	for (int i = 0; i < threadNum; i++) {
 		//pthread_kill(threads[i], SIGUSR1);
@@ -79,6 +143,13 @@ ThreadPool::~ThreadPool() {
 	delete[] threads;
 }
 
+/***************************************
+ * Function Name: executeTasks
+ * The Input: no input
+ * The Output: NULL
+ * The Function Operation: executing the tasks
+ * that the thread pool contains
+ **************************************/
 void ThreadPool::executeTasks() {
 	while (!stopped) {
 		pthread_mutex_lock(&queueLock);
@@ -95,6 +166,13 @@ void ThreadPool::executeTasks() {
 	}
 }
 
+/***************************************
+ * Function Name: execute
+ * The Input: a pointer to an argument
+ * The Output: NULL
+ * The Function Operation: executes the executeTasks
+ * function
+ **************************************/
 void* ThreadPool::execute(void* arg) {
 	ThreadPool *pool = (ThreadPool *)arg;
 	pool->executeTasks();
